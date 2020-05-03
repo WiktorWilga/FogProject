@@ -16,6 +16,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "InteractableObject.h"
+#include "GameFramework/PlayerController.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -24,7 +25,7 @@ AFogCharacter::AFogCharacter()
 
 	// Don't rotate character to camera direction
 	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
+	bUseControllerRotationYaw = true;
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
@@ -60,7 +61,11 @@ void AFogCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (CursorMaterialInstance)
+	if (!IsLocallyControlled())
+	{
+		CursorToWorld->SetVisibility(false);
+	}
+	else if (CursorMaterialInstance)
 	{
 		CursorMaterial = UMaterialInstanceDynamic::Create(CursorMaterialInstance, nullptr);
 		CursorToWorld->SetDecalMaterial(CursorMaterial);
@@ -71,8 +76,11 @@ void AFogCharacter::Tick(float DeltaSeconds)
 {
     Super::Tick(DeltaSeconds);
 
-	CursorTick();
-	RotateCharacterToCursor(DeltaSeconds);
+	if (IsLocallyControlled())
+	{
+		CursorTick();
+		RotateCharacterToCursor(DeltaSeconds);
+	}
 }
 
 void AFogCharacter::CursorTick()
@@ -88,11 +96,15 @@ void AFogCharacter::CursorTick()
 void AFogCharacter::RotateCharacterToCursor(float DeltaSeconds)
 {
 	if (CursorToWorld == nullptr) return;
-
+	
 	FRotator DesiredRotation = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), CursorToWorld->GetComponentLocation());
 	DesiredRotation.Roll = DesiredRotation.Pitch = 0.0f;
 	FRotator AllowedDeltaRotation = UKismetMathLibrary::RInterpTo(GetActorRotation(), DesiredRotation, DeltaSeconds, 4.0f);
-	SetActorRotation(AllowedDeltaRotation);
+	
+	//set in controller rotation, because character use controller yaw rotation, thanks to rotation is automaticly replicated
+	//by movement component
+	GetController<APlayerController>()->SetControlRotation(AllowedDeltaRotation);
+	GetController<APlayerController>()->UpdateRotation(DeltaSeconds);
 }
 
 void AFogCharacter::AddPickUpObjectToInventory(FName PickUpName, int32 Amount)
