@@ -31,25 +31,24 @@ void APickUpObject::Tick(float DeltaTime)
 
 }
 
-void APickUpObject::Interact()
+void APickUpObject::Interact(class AFogCharacter* Invoker)
 {
-	auto Character = Cast<AFogCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!Character) return;
+	if (!Invoker) return;
 
 	for (TPair<FName, int32> Element : Inventory)
 	{
-		Character->AddPickUpObjectToInventory(Element.Key, Element.Value);
+		Invoker->AddPickUpObjectToInventory(Element.Key, Element.Value);
 	}
 
 	Destroy();
 }
 
-void APickUpObject::OnHovered()
+void APickUpObject::OnHovered(class AFogCharacter* Invoker)
 {
-	Super::OnHovered();
+	Super::OnHovered(Invoker);
 }
 
-void APickUpObject::OnUnhovered()
+void APickUpObject::OnUnhovered(class AFogCharacter* Invoker)
 {
-	Super::OnUnhovered();
+	Super::OnUnhovered(Invoker);
 }

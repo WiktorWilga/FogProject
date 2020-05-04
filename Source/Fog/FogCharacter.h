@@ -6,6 +6,22 @@
 #include "GameFramework/Character.h"
 #include "FogCharacter.generated.h"
 
+USTRUCT()
+struct FInventoryItemWithCounter
+{
+
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY()
+		FName Name;
+
+	UPROPERTY()
+		uint32 Num;
+
+	FInventoryItemWithCounter() : Name(""), Num(0) {}
+	FInventoryItemWithCounter(FName NewName, uint32 NewNum) : Name(NewName), Num(NewNum) {}
+};
+
 
 UCLASS(Blueprintable)
 class AFogCharacter : public ACharacter
@@ -28,13 +44,11 @@ public:
 	FORCEINLINE class UDecalComponent* GetCursorToWorld() { return CursorToWorld; }
 
 	/** Add/remove from inventory*/
-	UFUNCTION(BlueprintCallable)
-	void AddPickUpObjectToInventory(FName PickUpName, int32 Amount = 1);
-	UFUNCTION(BlueprintCallable)
-	void RemovePickUpObjectFromInventory(FName PickUpName, int32 Amount = 1);
+	void AddPickUpObjectToInventory(FName PickUpName, uint32 Amount = 1);
+	void RemovePickUpObjectFromInventory(FName PickUpName, uint32 Amount = 1);
 
 	/** Getter for character inventory*/
-	FORCEINLINE TMap<FName, int32> GetInventory() { return Inventory; }
+	FORCEINLINE TArray<FInventoryItemWithCounter> GetInventory() { return Inventory; }
 
 	/**Getter/setter for character's weapon*/
 	FORCEINLINE struct FInventoryItem* GetWeapon() { return Weapon; }
@@ -45,11 +59,12 @@ public:
 	FORCEINLINE void SetArmor(struct FInventoryItem* NewArmor) { Armor = NewArmor; }
 
 	/**Getter/setter fo current interactable object in avaliable range*/
-	FORCEINLINE void SetAvaliableInteraction(class AInteractableObject* Object) { AvaliableInteraction = Object; }
-	FORCEINLINE class AInteractableObject* GetAvaliableInteraction() { return AvaliableInteraction; }
+	FORCEINLINE void SetAvaliableInteraction(class AInteractableObject* Object) { Server_AvaliableInteraction = Object; }
+	FORCEINLINE class AInteractableObject* GetAvaliableInteraction() { return Server_AvaliableInteraction; }
 
 	/**Perform interaction with current selected avaliable object*/
-	void MakeCurrentInteraction();
+	UFUNCTION(Server, Reliable)
+	void Server_MakeCurrentInteraction();
 
 private:
 	/** Top down camera */
@@ -79,12 +94,16 @@ private:
 	void RotateCharacterToCursor(float DeltaSeconds);
 
 	/** Character inventory*/
-	TMap<FName, int32> Inventory;
+	UPROPERTY(Replicated)
+	TArray<FInventoryItemWithCounter> Inventory;
 	struct FInventoryItem* Weapon;
 	struct FInventoryItem* Armor;
 
 	/**Current selected object to interaction*/
-	class AInteractableObject* AvaliableInteraction = nullptr;
+	class AInteractableObject* Server_AvaliableInteraction = nullptr;
+
+	/**Return array index if given name is in inventory or -1 if isnt*/
+	int32 GetInventoryItemIndex(FName Name);
 
 };
 

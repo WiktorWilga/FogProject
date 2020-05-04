@@ -55,5 +55,5 @@ void AFogPlayerController::OnInteract()
 	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
 	if (!FogCharacter) return;
 
-	FogCharacter->MakeCurrentInteraction();
+	FogCharacter->Server_MakeCurrentInteraction();
 }

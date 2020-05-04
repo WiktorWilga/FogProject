@@ -55,6 +55,16 @@ AFogCharacter::AFogCharacter()
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
+
+	SetReplicates(true);
+	SetReplicateMovement(true);
+}
+
+void AFogCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AFogCharacter, Inventory);
 }
 
 void AFogCharacter::BeginPlay()
@@ -107,42 +117,55 @@ void AFogCharacter::RotateCharacterToCursor(float DeltaSeconds)
 	GetController<APlayerController>()->UpdateRotation(DeltaSeconds);
 }
 
-void AFogCharacter::AddPickUpObjectToInventory(FName PickUpName, int32 Amount)
+void AFogCharacter::AddPickUpObjectToInventory(FName PickUpName, uint32 Amount)
 {
-	int32* Result = Inventory.Find(PickUpName);
-	if (Result != nullptr)
+	int32 Result = GetInventoryItemIndex(PickUpName);
+	if (Result != -1)
 	{
-		Inventory.Remove(PickUpName);
-		Inventory.Add(PickUpName, (*Result + Amount));
+		Inventory.RemoveAt(Result);
+		Inventory.Add(FInventoryItemWithCounter(PickUpName, (Inventory[Result].Num + Amount)));
 	}
 	else
 	{
-		Inventory.Add(PickUpName,  Amount);
+		Inventory.Add(FInventoryItemWithCounter(PickUpName,  Amount));
 	}
 }
 
-void AFogCharacter::RemovePickUpObjectFromInventory(FName PickUpName, int32 Amount)
+void AFogCharacter::RemovePickUpObjectFromInventory(FName PickUpName, uint32 Amount)
 {
-	int32* Result = Inventory.Find(PickUpName);
-	if (Result != nullptr)
+	int32 Result = GetInventoryItemIndex(PickUpName);
+	if (Result != -1)
 	{
-		if (Amount >= *Result)
+		if (Amount >= Inventory[Result].Num)
 		{
-			Inventory.Remove(PickUpName);
+			Inventory.RemoveAt(Result);
 		}
 		else
 		{
-			Inventory.Remove(PickUpName);
-			Inventory.Add(PickUpName, (*Result - Amount));
+			Inventory.RemoveAt(Result);
+			Inventory.Add(FInventoryItemWithCounter(PickUpName, (Inventory[Result].Num - Amount)));
 		}
 	}
 }
 
-void AFogCharacter::MakeCurrentInteraction()
+int32 AFogCharacter::GetInventoryItemIndex(FName Name)
 {
-	if (AvaliableInteraction)
+	for (int32 i = 0; i < Inventory.Num(); ++i)
 	{
-		AvaliableInteraction->Interact();
-		AvaliableInteraction = nullptr;
+		if (Inventory[i].Name.IsEqual(Name))
+		{
+			return i;
+		}
+	}
+
+	return -1;
+}
+
+void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
+{
+	if (Server_AvaliableInteraction)
+	{
+		Server_AvaliableInteraction->Interact(this);
+		Server_AvaliableInteraction = nullptr;
 	}
 }

@@ -17,9 +17,9 @@ public:
 	APickUpObject();
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact() override;
-	virtual void OnHovered() override;
-	virtual void OnUnhovered() override;
+	virtual void Interact(class AFogCharacter* Invoker) override;
+	virtual void OnHovered(class AFogCharacter* Invoker) override;
+	virtual void OnUnhovered(class AFogCharacter* Invoker) override;
 
 protected:
 

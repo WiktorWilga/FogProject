@@ -40,11 +40,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	virtual void Interact() {};
+	virtual void Interact(class AFogCharacter* Invoker) {};
 
 	/**Called when character begin/end overlap collision sphere*/
-	virtual void OnHovered();
-	virtual void OnUnhovered();
+	virtual void OnHovered(class AFogCharacter* Invoker);
+	virtual void OnUnhovered(class AFogCharacter* Invoker);
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class UUserWidget> InfoWidgetClass;

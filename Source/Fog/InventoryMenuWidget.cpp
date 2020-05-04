@@ -44,10 +44,10 @@ void UInventoryMenuWidget::Setup()
 	{
 		ClearWrapBoxes();
 
-		for (TPair<FName, int32> Item : Character->GetInventory())
+		for (FInventoryItemWithCounter Item : Character->GetInventory())
 		{
 			const FString Context;
-			FInventoryItem* ItemData = InventoryDataTable->FindRow<FInventoryItem>(Item.Key, Context);
+			FInventoryItem* ItemData = InventoryDataTable->FindRow<FInventoryItem>(Item.Name, Context);
 
 			UInventoryMenuElementWidget* NewElement = CreateWidget<UInventoryMenuElementWidget>(this, ElementClass);
 			NewElement->SetData(ItemData, this);

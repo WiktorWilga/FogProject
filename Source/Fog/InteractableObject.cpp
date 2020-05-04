@@ -19,6 +19,8 @@ AInteractableObject::AInteractableObject()
 	InfoWidgetInst = CreateDefaultSubobject<UWidgetComponent>(TEXT("InfoWidget"));
 	InfoWidgetInst->SetVisibility(false);
 	InfoWidgetInst->SetupAttachment(RootComponent);
+
+	SetReplicates(true);
 }
 
 // Called when the game starts or when spawned
@@ -45,9 +47,15 @@ void AInteractableObject::OnSphereOverlapBegin(UPrimitiveComponent* OverlappedCo
 	auto Character = Cast<AFogCharacter>(OtherActor);
 	if (!Character) return;
 
-	InfoWidgetInst->SetVisibility(true);
+	if (Character->IsLocallyControlled())
+	{
+		InfoWidgetInst->SetVisibility(true);
+	}
 
-	OnHovered();
+	if (HasAuthority())
+	{
+		OnHovered(Character);
+	}
 }
 
 void AInteractableObject::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, 
@@ -56,26 +64,30 @@ void AInteractableObject::OnSphereOverlapEnd(UPrimitiveComponent* OverlappedComp
 	auto Character = Cast<AFogCharacter>(OtherActor);
 	if (!Character) return;
 
-	InfoWidgetInst->SetVisibility(false);
-
-	OnUnhovered();
-}
-
-void AInteractableObject::OnHovered()
-{
-	auto Character = Cast<AFogCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(),0));
-	if (!Character) return;
-
-	Character->SetAvaliableInteraction(this);
-}
-
-void AInteractableObject::OnUnhovered()
-{
-	auto Character = Cast<AFogCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
-	if (!Character) return;
-
-	if (Character->GetAvaliableInteraction() == this)
+	if (Character->IsLocallyControlled())
 	{
-		Character->SetAvaliableInteraction(nullptr);
+		InfoWidgetInst->SetVisibility(false);
+	}
+
+	if (HasAuthority())
+	{
+		OnUnhovered(Character);
+	}
+}
+
+void AInteractableObject::OnHovered(AFogCharacter* Invoker)
+{
+	if (!Invoker) return;
+
+	Invoker->SetAvaliableInteraction(this);
+}
+
+void AInteractableObject::OnUnhovered(AFogCharacter* Invoker)
+{
+	if (!Invoker) return;
+
+	if (Invoker->GetAvaliableInteraction() == this)
+	{
+		Invoker->SetAvaliableInteraction(nullptr);
 	}
 }
