@@ -23,13 +23,15 @@ protected:
 	virtual void SetupInputComponent() override;
 	// End PlayerController interface
 
+	// Player input
 	UFUNCTION()
 		void MoveForward(float Value);
 	UFUNCTION()
 		void MoveRight(float Value);
-
 	UFUNCTION()
 		void OnInteract();
+	UFUNCTION()
+		void OnAttack();
 };
 
 

@@ -29,6 +29,7 @@ void AFogPlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	InputComponent->BindAction("Interaction", IE_Pressed, this, &AFogPlayerController::OnInteract);
+	InputComponent->BindAction("Attack", IE_Pressed, this, &AFogPlayerController::OnAttack);
 
 	InputComponent->BindAxis("Forward", this, &AFogPlayerController::MoveForward);
 	InputComponent->BindAxis("Right", this, &AFogPlayerController::MoveRight);
@@ -56,4 +57,12 @@ void AFogPlayerController::OnInteract()
 	if (!FogCharacter) return;
 
 	FogCharacter->Server_MakeCurrentInteraction();
+}
+
+void AFogPlayerController::OnAttack()
+{
+	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+	if (!FogCharacter) return;
+
+	FogCharacter->Server_PerformAttack();
 }

@@ -17,6 +17,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "InteractableObject.h"
 #include "GameFramework/PlayerController.h"
+#include "Animation/AnimMontage.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/AnimInstance.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -168,4 +171,31 @@ void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
 		Server_AvaliableInteraction->Interact(this);
 		Server_AvaliableInteraction = nullptr;
 	}
+}
+
+void AFogCharacter::Server_PerformAttack_Implementation()
+{
+	if (IsPerformingAttack()) return;
+
+	CurrentAttack = (CurrentAttack + 1) % 2;
+
+	if (CurrentAttack == 0)
+	{
+		NetMulticast_PlayMontage(FirstAttackAnim);
+	}
+	else if (CurrentAttack == 1)
+	{
+		NetMulticast_PlayMontage(SecondAttackAnim);
+	}
+}
+
+bool AFogCharacter::IsPerformingAttack()
+{
+	return (GetMesh()->GetAnimInstance()->Montage_IsPlaying(FirstAttackAnim) ||
+		GetMesh()->GetAnimInstance()->Montage_IsPlaying(SecondAttackAnim));
+}
+
+void AFogCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage* AnimMontage)
+{
+	PlayAnimMontage(AnimMontage);
 }
