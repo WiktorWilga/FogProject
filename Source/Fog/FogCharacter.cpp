@@ -20,6 +20,8 @@
 #include "Animation/AnimMontage.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
+#include "Engine/DataTable.h"
+#include "WeaponComponent.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -54,6 +56,10 @@ AFogCharacter::AFogCharacter()
 	CursorToWorld->SetupAttachment(RootComponent);
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion()); 
+
+	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+	FName SocketName("WeaponSocket");
+	WeaponComponent->SetupAttachment(GetMesh(), SocketName);
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -175,6 +181,7 @@ void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
 
 void AFogCharacter::Server_PerformAttack_Implementation()
 {
+	if (!WeaponComponent || !WeaponComponent->GetWeaponData()) return;
 	if (IsPerformingAttack()) return;
 
 	CurrentAttack = (CurrentAttack + 1) % 2;
@@ -198,4 +205,27 @@ bool AFogCharacter::IsPerformingAttack()
 void AFogCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage* AnimMontage)
 {
 	PlayAnimMontage(AnimMontage);
+}
+
+FWeaponInfo* AFogCharacter::GetWeapon()
+{
+	if (!WeaponComponent) return nullptr;
+
+	return WeaponComponent->GetWeaponData();
+}
+
+void AFogCharacter::Server_SetWeapon_Implementation(FName WeaponName)
+{
+	if (!WeaponComponent) return;
+
+	const FString Context;
+	FWeaponInfo* ItemData = WeaponDataTable->FindRow<FWeaponInfo>(WeaponName, Context);
+	if (!ItemData) return;
+
+	WeaponComponent->SetWeaponData(ItemData);
+}
+
+bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
+{
+	return GetInventoryItemIndex(WeaponName) != -1;
 }

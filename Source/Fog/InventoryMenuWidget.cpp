@@ -50,7 +50,7 @@ void UInventoryMenuWidget::Setup()
 			FInventoryItem* ItemData = InventoryDataTable->FindRow<FInventoryItem>(Item.Name, Context);
 
 			UInventoryMenuElementWidget* NewElement = CreateWidget<UInventoryMenuElementWidget>(this, ElementClass);
-			NewElement->SetData(ItemData, this);
+			NewElement->SetData(Item.Name, ItemData, this);
 
 			AddElementToWrapBox(NewElement, ItemData->Type);
 		}
@@ -104,7 +104,7 @@ void UInventoryMenuWidget::OnOther()
 	TypeWidgetSwitcher->SetActiveWidget(OtherWrapBox);
 }
 
-void UInventoryMenuWidget::OnClickedElement(struct FInventoryItem* ElementItem)
+void UInventoryMenuWidget::OnClickedElement(FName ItemName, FInventoryItem* ElementItem)
 {
 	if (!ElementItem) return;
 
@@ -114,12 +114,12 @@ void UInventoryMenuWidget::OnClickedElement(struct FInventoryItem* ElementItem)
 	switch (ElementItem->Type)
 	{
 	case EInventoryType::IT_Weapon:
-		Character->SetWeapon(ElementItem); 
-		SetSlot(ElementItem);
+		SetCharacterWeapon(ItemName);
+		SetSlot(ItemName, ElementItem);
 		break;
 	case EInventoryType::IT_Armor:
 		Character->SetArmor(ElementItem);
-		SetSlot(ElementItem);
+		SetSlot(ItemName, ElementItem);
 		break;
 	case EInventoryType::IT_Food:
 		break;
@@ -128,7 +128,7 @@ void UInventoryMenuWidget::OnClickedElement(struct FInventoryItem* ElementItem)
 	}
 }
 
-void UInventoryMenuWidget::SetSlot(struct FInventoryItem* NewSlotItem)
+void UInventoryMenuWidget::SetSlot(FName ItemName, FInventoryItem* NewSlotItem)
 {
 	if (!NewSlotItem) return;
 
@@ -152,12 +152,20 @@ void UInventoryMenuWidget::SetSlot(struct FInventoryItem* NewSlotItem)
 		auto CurrentWeapon = Cast<UInventoryMenuElementWidget>(Child);
 		if (CurrentWeapon)
 		{
-			CurrentWeapon->SetData(NewSlotItem, this);
+			CurrentWeapon->SetData(ItemName, NewSlotItem, this);
 			return;
 		}
 	}
 
 	UInventoryMenuElementWidget* NewElement = CreateWidget<UInventoryMenuElementWidget>(this, ElementClass);
-	NewElement->SetData(NewSlotItem, this);
+	NewElement->SetData(ItemName, NewSlotItem, this);
 	DesiredOverlay->AddChildToOverlay(NewElement);
+}
+
+void UInventoryMenuWidget::SetCharacterWeapon(FName ItemName)
+{
+	auto Character = Cast<AFogCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	if (!Character) return;
+
+	Character->Server_SetWeapon(ItemName);
 }

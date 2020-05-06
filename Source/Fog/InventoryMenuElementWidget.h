@@ -16,7 +16,7 @@ class FOG_API UInventoryMenuElementWidget : public UUserWidget
 
 public:
 
-	void SetData(struct FInventoryItem* Item, class UInventoryMenuWidget* Parent);
+	void SetData(FName Name, struct FInventoryItem* Item, class UInventoryMenuWidget* Parent);
 
 protected:
 
@@ -27,6 +27,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 		class UImage* ElementImage;
 	
+	FName ItemName;
 	struct FInventoryItem* ItemData;
 
 	UPROPERTY()

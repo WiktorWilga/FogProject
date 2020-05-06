@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "WeaponStructures.h"
 #include "FogCharacter.generated.h"
 
 USTRUCT()
@@ -51,8 +52,9 @@ public:
 	FORCEINLINE TArray<FInventoryItemWithCounter> GetInventory() { return Inventory; }
 
 	/**Getter/setter for character's weapon*/
-	FORCEINLINE struct FInventoryItem* GetWeapon() { return Weapon; }
-	FORCEINLINE void SetWeapon(struct FInventoryItem* NewWeapon) { Weapon = NewWeapon; }
+	FWeaponInfo* GetWeapon();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetWeapon(FName WeaponName);
 
 	/**Getter/setter for character's armor*/
 	FORCEINLINE struct FInventoryItem* GetArmor() { return Armor; }
@@ -91,6 +93,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UMaterialInstance* CursorMaterialInstance;
 
+	/** Weapon component for combat system */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UWeaponComponent* WeaponComponent;
+
 	/**Set cursor location*/
 	void CursorTick();
 
@@ -100,7 +106,6 @@ private:
 	/** Character inventory*/
 	UPROPERTY(Replicated)
 	TArray<FInventoryItemWithCounter> Inventory;
-	struct FInventoryItem* Weapon;
 	struct FInventoryItem* Armor;
 
 	/**Current selected object to interaction*/
@@ -124,6 +129,10 @@ private:
 	/**Play given montage on every machines*/
 	UFUNCTION(NetMulticast, Reliable)
 	void NetMulticast_PlayMontage(class UAnimMontage* AnimMontage);
+
+	/**Reference to weapons data table*/
+	UPROPERTY(EditDefaultsOnly)
+		class UDataTable* WeaponDataTable;
 
 };
 

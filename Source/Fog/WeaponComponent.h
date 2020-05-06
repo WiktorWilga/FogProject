@@ -8,7 +8,7 @@
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class FOG_API UWeaponComponent : public USceneComponent
+class FOG_API UWeaponComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
@@ -24,12 +24,12 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
+	void SetWeaponData(struct FWeaponInfo* NewWeaponData);
+
+	FORCEINLINE struct FWeaponInfo* GetWeaponData() { return WeaponData; }
+
 private:
 
-	UPROPERTY(VisibleAnywhere)
-	class UStaticMeshComponent* Mesh;
-
-	UPROPERTY(EditAnywhere)
-	float Damage;
+	struct FWeaponInfo* WeaponData;
 		
 };

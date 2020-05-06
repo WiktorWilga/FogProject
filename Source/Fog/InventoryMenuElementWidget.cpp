@@ -6,8 +6,9 @@
 #include "InventoryStructures.h"
 #include "InventoryMenuWidget.h"
 
-void UInventoryMenuElementWidget::SetData(FInventoryItem* Item, UInventoryMenuWidget* Parent)
+void UInventoryMenuElementWidget::SetData(FName Name, FInventoryItem* Item, UInventoryMenuWidget* Parent)
 {
+	ItemName = Name;
 	ItemData = Item;
 	ParentWidget = Parent;
 
@@ -18,7 +19,7 @@ FReply UInventoryMenuElementWidget::NativeOnMouseButtonDoubleClick(const FGeomet
 {
 	if (InMouseEvent.GetEffectingButton().ToString().Equals("LeftMouseButton"))
 	{
-		ParentWidget->OnClickedElement(ItemData);
+		ParentWidget->OnClickedElement(ItemName, ItemData);
 	}
 
 	return Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);

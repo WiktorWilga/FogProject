@@ -19,7 +19,7 @@ public:
 
 	bool Initialize() override;
 
-	void OnClickedElement(struct FInventoryItem* ElementItem);
+	void OnClickedElement(FName ItemName, struct FInventoryItem* ElementItem);
 
 protected:
 
@@ -80,6 +80,8 @@ private:
 	void ClearWrapBoxes();
 	void AddElementToWrapBox(class UInventoryMenuElementWidget* Element, EInventoryType Type);
 
-	void SetSlot(struct FInventoryItem* NewSlotItem);
+	void SetSlot(FName ItemName, struct FInventoryItem* NewSlotItem);
+
+	void SetCharacterWeapon(FName ItemName);
 
 };

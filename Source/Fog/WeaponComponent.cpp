@@ -3,6 +3,7 @@
 
 #include "WeaponComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "WeaponStructures.h"
 
 // Sets default values for this component's properties
 UWeaponComponent::UWeaponComponent()
@@ -11,7 +12,7 @@ UWeaponComponent::UWeaponComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	SetIsReplicated(true);
 
 	// ...
 }
@@ -23,7 +24,6 @@ void UWeaponComponent::BeginPlay()
 	Super::BeginPlay();
 
 	// ...
-	
 }
 
 
@@ -35,3 +35,10 @@ void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	// ...
 }
 
+void UWeaponComponent::SetWeaponData(struct FWeaponInfo* NewWeaponData)
+{
+	if (!NewWeaponData) return;
+
+	WeaponData = NewWeaponData;
+	SetStaticMesh(WeaponData->Mesh.Get());
+}
