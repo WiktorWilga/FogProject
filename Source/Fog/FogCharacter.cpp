@@ -229,3 +229,17 @@ bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
 {
 	return GetInventoryItemIndex(WeaponName) != -1;
 }
+
+void AFogCharacter::StartWeaponCheck()
+{
+	if (!WeaponComponent) return;
+
+	WeaponComponent->EnableCollisionCheck();
+}
+
+void AFogCharacter::StopWeaponCheck()
+{
+	if (!WeaponComponent) return;
+
+	WeaponComponent->DisableCollisionCheck();
+}

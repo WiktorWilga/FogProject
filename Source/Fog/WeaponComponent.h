@@ -3,33 +3,38 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "WeaponComponent.generated.h"
 
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS()
 class FOG_API UWeaponComponent : public UStaticMeshComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UWeaponComponent();
-
-protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
+	UWeaponComponent(const FObjectInitializer& ObjectInitializer);
 
 public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	void SetWeaponData(struct FWeaponInfo* NewWeaponData);
 
 	FORCEINLINE struct FWeaponInfo* GetWeaponData() { return WeaponData; }
 
+	void EnableCollisionCheck();
+	void DisableCollisionCheck();
+
 private:
 
 	struct FWeaponInfo* WeaponData;
+
+	UFUNCTION()
+		void OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, 
+			class UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, 
+			class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 		
 };

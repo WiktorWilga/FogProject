@@ -72,6 +72,10 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_PerformAttack();
 
+	/**Weapon checking collison*/
+	void StartWeaponCheck();
+	void StopWeaponCheck();
+
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

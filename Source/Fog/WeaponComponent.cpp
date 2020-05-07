@@ -2,37 +2,17 @@
 
 
 #include "WeaponComponent.h"
-#include "Components/StaticMeshComponent.h"
 #include "WeaponStructures.h"
 
 // Sets default values for this component's properties
-UWeaponComponent::UWeaponComponent()
+UWeaponComponent::UWeaponComponent(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
 
-	SetIsReplicated(true);
+	OnComponentBeginOverlap.AddDynamic(this, &UWeaponComponent::OnOverlapBegin);
+	OnComponentEndOverlap.AddDynamic(this, &UWeaponComponent::OnOverlapEnd);
 
-	// ...
-}
-
-
-// Called when the game starts
-void UWeaponComponent::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// ...
-}
-
-
-// Called every frame
-void UWeaponComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	//SetIsReplicated(true);
 }
 
 void UWeaponComponent::SetWeaponData(struct FWeaponInfo* NewWeaponData)
@@ -41,4 +21,30 @@ void UWeaponComponent::SetWeaponData(struct FWeaponInfo* NewWeaponData)
 
 	WeaponData = NewWeaponData;
 	SetStaticMesh(WeaponData->Mesh.Get());
+}
+
+void UWeaponComponent::EnableCollisionCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("EnableC"));
+
+	SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+}
+
+void UWeaponComponent::DisableCollisionCheck()
+{
+	UE_LOG(LogTemp, Warning, TEXT("DisableC"));
+
+	SetCollisionEnabled(ECollisionEnabled::NoCollision);
+}
+
+void UWeaponComponent::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+									  int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Collision!"));
+}
+
+void UWeaponComponent::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, 
+									int32 OtherBodyIndex)
+{
+
 }
