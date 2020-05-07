@@ -99,7 +99,7 @@ private:
 
 	/** Weapon component for combat system */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UWeaponComponent* WeaponComponent;
+		class UChildActorComponent* Weapon;
 
 	/**Set cursor location*/
 	void CursorTick();

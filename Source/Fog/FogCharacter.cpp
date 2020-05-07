@@ -21,7 +21,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Engine/DataTable.h"
-#include "WeaponComponent.h"
+#include "Components/ChildActorComponent.h"
+#include "Weapon.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -57,9 +58,11 @@ AFogCharacter::AFogCharacter()
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion()); 
 
-	WeaponComponent = CreateDefaultSubobject<UWeaponComponent>(TEXT("WeaponComponent"));
+	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("Weapon"));
+	Weapon->SetChildActorClass(AWeapon::StaticClass());
 	FName SocketName("WeaponSocket");
-	WeaponComponent->SetupAttachment(GetMesh(), SocketName);
+	Weapon->SetupAttachment(GetMesh(), SocketName);
+	Weapon->SetIsReplicated(true);
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -181,8 +184,14 @@ void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
 
 void AFogCharacter::Server_PerformAttack_Implementation()
 {
-	if (!WeaponComponent || !WeaponComponent->GetWeaponData()) return;
 	if (IsPerformingAttack()) return;
+
+	if (!Weapon) return;
+
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	if (!MyWeapon->GetWeaponData()) return;
 
 	CurrentAttack = (CurrentAttack + 1) % 2;
 
@@ -209,20 +218,26 @@ void AFogCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage* 
 
 FWeaponInfo* AFogCharacter::GetWeapon()
 {
-	if (!WeaponComponent) return nullptr;
+	if (!Weapon) return nullptr;
 
-	return WeaponComponent->GetWeaponData();
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return nullptr;
+
+	return MyWeapon->GetWeaponData();
 }
 
 void AFogCharacter::Server_SetWeapon_Implementation(FName WeaponName)
 {
-	if (!WeaponComponent) return;
+	if (!Weapon) return;
 
 	const FString Context;
 	FWeaponInfo* ItemData = WeaponDataTable->FindRow<FWeaponInfo>(WeaponName, Context);
 	if (!ItemData) return;
 
-	WeaponComponent->SetWeaponData(ItemData);
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	MyWeapon->SetWeaponData(ItemData);
 }
 
 bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
@@ -232,14 +247,20 @@ bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
 
 void AFogCharacter::StartWeaponCheck()
 {
-	if (!WeaponComponent) return;
+	if (!Weapon) return;
 
-	WeaponComponent->EnableCollisionCheck();
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	MyWeapon->EnableCollisionCheck();
 }
 
 void AFogCharacter::StopWeaponCheck()
 {
-	if (!WeaponComponent) return;
+	if (!Weapon) return;
 
-	WeaponComponent->DisableCollisionCheck();
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	MyWeapon->DisableCollisionCheck();
 }

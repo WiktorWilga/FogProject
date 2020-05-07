@@ -14,7 +14,7 @@ struct FWeaponInfo : public FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-		TSoftObjectPtr<UStaticMesh> Mesh;
+		UStaticMesh* Mesh;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		float Damage;
