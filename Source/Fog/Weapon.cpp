@@ -4,7 +4,9 @@
 #include "Weapon.h"
 #include "WeaponStructures.h"
 #include "Components/StaticMeshComponent.h"
-
+#include "EnemyCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/DamageType.h"
 
 // Sets default values
 AWeapon::AWeapon()
@@ -25,8 +27,11 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnOverlapBegin);
-	Mesh->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnOverlapEnd);
+	if (HasAuthority())
+	{
+		Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnOverlapBegin);
+		Mesh->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnOverlapEnd);
+	}
 }
 
 // Called every frame
@@ -47,22 +52,22 @@ void AWeapon::SetWeaponData(FWeaponInfo* NewWeaponData)
 
 void AWeapon::EnableCollisionCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("EnableC"));
-
 	Mesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 }
 
 void AWeapon::DisableCollisionCheck()
 {
-	UE_LOG(LogTemp, Warning, TEXT("DisableC"));
-
 	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 void AWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Collision!"));
+	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OtherActor);
+	if (!Enemy) return;
+
+	UGameplayStatics::ApplyDamage(Enemy, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
+
 }
 
 void AWeapon::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,

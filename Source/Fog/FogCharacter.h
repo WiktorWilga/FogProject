@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "FightCharacter.h"
 #include "WeaponStructures.h"
 #include "FogCharacter.generated.h"
 
@@ -25,7 +25,7 @@ struct FInventoryItemWithCounter
 
 
 UCLASS(Blueprintable)
-class AFogCharacter : public ACharacter
+class AFogCharacter : public AFightCharacter
 {
 	GENERATED_BODY()
 
