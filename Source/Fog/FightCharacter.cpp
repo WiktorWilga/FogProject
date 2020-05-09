@@ -5,6 +5,10 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/Controller.h"
 #include "Components/CapsuleComponent.h"
+#include "Animation/AnimMontage.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Animation/AnimInstance.h"
+#include "Weapon.h"
 
 // Sets default values
 AFightCharacter::AFightCharacter()
@@ -60,4 +64,51 @@ void AFightCharacter::NetMulticast_Death_Implementation()
 void AFightCharacter::Server_Death_Implementation()
 {
 	Controller->UnPossess();
+}
+
+void AFightCharacter::Server_PerformAttack_Implementation()
+{
+	if (IsPerformingAttack()) return;
+
+	if (!Weapon) return;
+
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	if (!MyWeapon->GetWeaponData()) return;
+
+	++CurrentAttack;
+	CurrentAttack %= AttackAnims.Num();
+
+	NetMulticast_PlayMontage(AttackAnims[CurrentAttack]);
+}
+
+bool AFightCharacter::IsPerformingAttack()
+{
+	return (GetMesh()->GetAnimInstance()->Montage_IsPlaying(AttackAnims[CurrentAttack]));
+}
+
+void AFightCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage* AnimMontage)
+{
+	PlayAnimMontage(AnimMontage);
+}
+
+void AFightCharacter::StartWeaponCheck()
+{
+	if (!Weapon) return;
+
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	MyWeapon->EnableCollisionCheck();
+}
+
+void AFightCharacter::StopWeaponCheck()
+{
+	if (!Weapon) return;
+
+	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	if (!MyWeapon) return;
+
+	MyWeapon->DisableCollisionCheck();
 }

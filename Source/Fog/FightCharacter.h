@@ -36,8 +36,34 @@ public:
 	UFUNCTION(Server, Reliable)
 	virtual void Server_Death();
 
+	/**Start attack animation if isnt performing now*/
+	UFUNCTION(Server, Reliable)
+		virtual void Server_PerformAttack();
+
+	/**Weapon checking collison*/
+	void StartWeaponCheck();
+	void StopWeaponCheck();
+
 protected:
 
 	float Health;
 	float MaxHealth = 100;
+
+	/** Weapon component for combat system */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		class UChildActorComponent* Weapon;
+
+	/**Combat system's animations*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		TArray<class UAnimMontage*> AttackAnims;
+
+	/**Attack in series counter*/
+	uint8 CurrentAttack = 0;
+
+	/**Return true if character is playing attack anim at this moment*/
+	bool IsPerformingAttack();
+
+	/**Play given montage on every machines*/
+	UFUNCTION(NetMulticast, Reliable)
+		void NetMulticast_PlayMontage(class UAnimMontage* AnimMontage);
 };

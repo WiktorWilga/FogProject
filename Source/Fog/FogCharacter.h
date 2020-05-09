@@ -68,14 +68,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_MakeCurrentInteraction();
 
-	/**Start attack animation if isnt performing now*/
-	UFUNCTION(Server, Reliable)
-	void Server_PerformAttack();
-
-	/**Weapon checking collison*/
-	void StartWeaponCheck();
-	void StopWeaponCheck();
-
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -97,10 +89,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		class UMaterialInstance* CursorMaterialInstance;
 
-	/** Weapon component for combat system */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UChildActorComponent* Weapon;
-
 	/**Set cursor location*/
 	void CursorTick();
 
@@ -117,22 +105,6 @@ private:
 
 	/**Return array index if given name is in inventory or -1 if isnt*/
 	int32 GetInventoryItemIndex(FName Name);
-
-	/**Combat system's animations*/
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UAnimMontage* FirstAttackAnim;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UAnimMontage* SecondAttackAnim;
-
-	/**Attack in series counter*/
-	uint8 CurrentAttack = 0;
-
-	/**Return true if character is playing attack anim at this moment*/
-	bool IsPerformingAttack();
-
-	/**Play given montage on every machines*/
-	UFUNCTION(NetMulticast, Reliable)
-	void NetMulticast_PlayMontage(class UAnimMontage* AnimMontage);
 
 	/**Reference to weapons data table*/
 	UPROPERTY(EditDefaultsOnly)

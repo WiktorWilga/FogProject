@@ -29,4 +29,15 @@ public:
 	UPROPERTY(EditAnywhere)
 		class UBehaviorTree* BehaviorTree;
 
+	FVector GetNextTargetLocation();
+
+private:
+
+	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
+		TArray<FVector> TargetLocations;
+
+	/** Character start location; used to calculate true location from TargetLocations, which are relative location*/
+	FVector OffsetLocation;
+
+	uint8 CurrentTargetLocation = 0;
 };

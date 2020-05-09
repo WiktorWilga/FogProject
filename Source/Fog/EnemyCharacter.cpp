@@ -16,6 +16,7 @@ void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	OffsetLocation = GetActorLocation();
 }
 
 // Called every frame
@@ -30,4 +31,12 @@ void AEnemyCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+}
+
+FVector AEnemyCharacter::GetNextTargetLocation()
+{
+	++CurrentTargetLocation;
+	CurrentTargetLocation %= TargetLocations.Num();
+
+	return (TargetLocations[CurrentTargetLocation] + OffsetLocation);
 }

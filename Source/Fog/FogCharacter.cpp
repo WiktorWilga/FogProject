@@ -2,7 +2,6 @@
 
 #include "FogCharacter.h"
 #include "Net/UnrealNetwork.h"
-#include "UObject/ConstructorHelpers.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/CapsuleComponent.h"
@@ -16,7 +15,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "InteractableObject.h"
-#include "GameFramework/PlayerController.h"
 #include "Animation/AnimMontage.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
@@ -182,40 +180,6 @@ void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
 	}
 }
 
-void AFogCharacter::Server_PerformAttack_Implementation()
-{
-	if (IsPerformingAttack()) return;
-
-	if (!Weapon) return;
-
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
-	if (!MyWeapon) return;
-
-	if (!MyWeapon->GetWeaponData()) return;
-
-	CurrentAttack = (CurrentAttack + 1) % 2;
-
-	if (CurrentAttack == 0)
-	{
-		NetMulticast_PlayMontage(FirstAttackAnim);
-	}
-	else if (CurrentAttack == 1)
-	{
-		NetMulticast_PlayMontage(SecondAttackAnim);
-	}
-}
-
-bool AFogCharacter::IsPerformingAttack()
-{
-	return (GetMesh()->GetAnimInstance()->Montage_IsPlaying(FirstAttackAnim) ||
-		GetMesh()->GetAnimInstance()->Montage_IsPlaying(SecondAttackAnim));
-}
-
-void AFogCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage* AnimMontage)
-{
-	PlayAnimMontage(AnimMontage);
-}
-
 FWeaponInfo* AFogCharacter::GetWeapon()
 {
 	if (!Weapon) return nullptr;
@@ -243,24 +207,4 @@ void AFogCharacter::Server_SetWeapon_Implementation(FName WeaponName)
 bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
 {
 	return GetInventoryItemIndex(WeaponName) != -1;
-}
-
-void AFogCharacter::StartWeaponCheck()
-{
-	if (!Weapon) return;
-
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
-	if (!MyWeapon) return;
-
-	MyWeapon->EnableCollisionCheck();
-}
-
-void AFogCharacter::StopWeaponCheck()
-{
-	if (!Weapon) return;
-
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
-	if (!MyWeapon) return;
-
-	MyWeapon->DisableCollisionCheck();
 }
