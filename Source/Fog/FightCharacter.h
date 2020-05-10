@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "FightCharacter.generated.h"
 
-UCLASS()
+UCLASS(Abstract)
 class FOG_API AFightCharacter : public ACharacter
 {
 	GENERATED_BODY()
@@ -44,14 +44,19 @@ public:
 	void StartWeaponCheck();
 	void StopWeaponCheck();
 
+	/**Return true if givan character is this characer enemy*/
+	virtual bool IsEnemy(AFightCharacter* Character) PURE_VIRTUAL(AFightCharacter::IsEnemy, return false;);
+
 protected:
 
 	float Health;
-	float MaxHealth = 100;
+
+	UPROPERTY(EditAnywhere, meta = (AllowPrivateAccess = "true"))
+	float MaxHealth;
 
 	/** Weapon component for combat system */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		class UChildActorComponent* Weapon;
+		class UChildActorComponent* WeaponComponent;
 
 	/**Combat system's animations*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))

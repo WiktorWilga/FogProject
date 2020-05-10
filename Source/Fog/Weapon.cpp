@@ -4,7 +4,7 @@
 #include "Weapon.h"
 #include "WeaponStructures.h"
 #include "Components/StaticMeshComponent.h"
-#include "EnemyCharacter.h"
+#include "FightCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/DamageType.h"
 
@@ -63,10 +63,16 @@ void AWeapon::DisableCollisionCheck()
 void AWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AEnemyCharacter* Enemy = Cast<AEnemyCharacter>(OtherActor);
-	if (!Enemy) return;
+	AFightCharacter* MyCharacter = Cast<AFightCharacter>(GetParentActor());
+	if (!MyCharacter) return;
 
-	UGameplayStatics::ApplyDamage(Enemy, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
+	AFightCharacter* AttackedCharacter = Cast<AFightCharacter>(OtherActor);
+	if (!AttackedCharacter) return;
+
+	if (MyCharacter->IsEnemy(AttackedCharacter))
+	{
+		UGameplayStatics::ApplyDamage(AttackedCharacter, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
+	}
 
 }
 

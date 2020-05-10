@@ -37,6 +37,7 @@ void AFogPlayerController::SetupInputComponent()
 
 void AFogPlayerController::MoveForward(float Value)
 {
+	if (!GetCharacter()) return;
 	if (Value == 0.0f) return;
 
 	FVector Direction(Value, 0.0f, 0.0f);
@@ -45,6 +46,7 @@ void AFogPlayerController::MoveForward(float Value)
 
 void AFogPlayerController::MoveRight(float Value)
 {
+	if (!GetCharacter()) return;
 	if (Value == 0.0f) return;
 
 	FVector Direction(0.0f, Value, 0.0f);

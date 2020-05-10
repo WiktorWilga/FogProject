@@ -21,6 +21,7 @@
 #include "Engine/DataTable.h"
 #include "Components/ChildActorComponent.h"
 #include "Weapon.h"
+#include "EnemyCharacter.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -55,12 +56,6 @@ AFogCharacter::AFogCharacter()
 	CursorToWorld->SetupAttachment(RootComponent);
 	CursorToWorld->DecalSize = FVector(16.0f, 32.0f, 32.0f);
 	CursorToWorld->SetRelativeRotation(FRotator(90.0f, 0.0f, 0.0f).Quaternion()); 
-
-	Weapon = CreateDefaultSubobject<UChildActorComponent>(TEXT("Weapon"));
-	Weapon->SetChildActorClass(AWeapon::StaticClass());
-	FName SocketName("WeaponSocket");
-	Weapon->SetupAttachment(GetMesh(), SocketName);
-	Weapon->SetIsReplicated(true);
 
 	// Activate ticking in order to update the cursor every frame.
 	PrimaryActorTick.bCanEverTick = true;
@@ -182,9 +177,9 @@ void AFogCharacter::Server_MakeCurrentInteraction_Implementation()
 
 FWeaponInfo* AFogCharacter::GetWeapon()
 {
-	if (!Weapon) return nullptr;
+	if (!WeaponComponent) return nullptr;
 
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
 	if (!MyWeapon) return nullptr;
 
 	return MyWeapon->GetWeaponData();
@@ -192,13 +187,13 @@ FWeaponInfo* AFogCharacter::GetWeapon()
 
 void AFogCharacter::Server_SetWeapon_Implementation(FName WeaponName)
 {
-	if (!Weapon) return;
+	if (!WeaponComponent) return;
 
 	const FString Context;
 	FWeaponInfo* ItemData = WeaponDataTable->FindRow<FWeaponInfo>(WeaponName, Context);
 	if (!ItemData) return;
 
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
 	if (!MyWeapon) return;
 
 	MyWeapon->SetWeaponData(ItemData);
@@ -207,4 +202,9 @@ void AFogCharacter::Server_SetWeapon_Implementation(FName WeaponName)
 bool AFogCharacter::Server_SetWeapon_Validate(FName WeaponName)
 {
 	return GetInventoryItemIndex(WeaponName) != -1;
+}
+
+bool AFogCharacter::IsEnemy(AFightCharacter* Character)
+{
+	return Character->IsA<AEnemyCharacter>();
 }

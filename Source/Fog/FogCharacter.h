@@ -68,6 +68,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_MakeCurrentInteraction();
 
+	/**Return true if givan character is this characer enemy*/
+	virtual bool IsEnemy(AFightCharacter* Character) override;
+
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

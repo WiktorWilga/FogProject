@@ -2,6 +2,9 @@
 
 
 #include "EnemyCharacter.h"
+#include "Weapon.h"
+#include "WeaponStructures.h"
+#include "FogCharacter.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -17,6 +20,8 @@ void AEnemyCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	OffsetLocation = GetActorLocation();
+
+	SetupEnemyWeapon();
 }
 
 // Called every frame
@@ -39,4 +44,19 @@ FVector AEnemyCharacter::GetNextTargetLocation()
 	CurrentTargetLocation %= TargetLocations.Num();
 
 	return (TargetLocations[CurrentTargetLocation] + OffsetLocation);
+}
+
+void AEnemyCharacter::SetupEnemyWeapon()
+{
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
+	if (MyWeapon && !WeaponRef.IsNull())
+	{
+		FString Context;
+		MyWeapon->SetWeaponData(WeaponRef.GetRow<FWeaponInfo>(Context));
+	}
+}
+
+bool AEnemyCharacter::IsEnemy(AFightCharacter* Character)
+{
+	return Character->IsA<AFogCharacter>();
 }

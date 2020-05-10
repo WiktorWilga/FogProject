@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "FightCharacter.h"
+#include "Engine/DataTable.h"
 #include "EnemyCharacter.generated.h"
 
 UCLASS()
@@ -31,6 +32,9 @@ public:
 
 	FVector GetNextTargetLocation();
 
+	/**Return true if givan character is this characer enemy*/
+	virtual bool IsEnemy(AFightCharacter* Character) override;
+
 private:
 
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
@@ -40,4 +44,11 @@ private:
 	FVector OffsetLocation;
 
 	uint8 CurrentTargetLocation = 0;
+
+	/** Set weapon component from selected weapon row from data table (WeaponRef)*/
+	void SetupEnemyWeapon();
+
+	/** Reference to weapon data table row*/
+	UPROPERTY(EditAnywhere)
+		FDataTableRowHandle WeaponRef;
 };

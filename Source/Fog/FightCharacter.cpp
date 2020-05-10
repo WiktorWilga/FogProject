@@ -16,13 +16,20 @@ AFightCharacter::AFightCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	Health = MaxHealth;
+	WeaponComponent = CreateDefaultSubobject<UChildActorComponent>(TEXT("WeaponComponent"));
+	WeaponComponent->SetChildActorClass(AWeapon::StaticClass());
+	FName SocketName("WeaponSocket");
+	WeaponComponent->SetupAttachment(GetMesh(), SocketName);
+	WeaponComponent->SetIsReplicated(true);
+
 }
 
 // Called when the game starts or when spawned
 void AFightCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	Health = MaxHealth;
 
 	OnTakeAnyDamage.AddDynamic(this, &AFightCharacter::TakeDamage);
 }
@@ -70,9 +77,9 @@ void AFightCharacter::Server_PerformAttack_Implementation()
 {
 	if (IsPerformingAttack()) return;
 
-	if (!Weapon) return;
+	if (!WeaponComponent) return;
 
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
 	if (!MyWeapon) return;
 
 	if (!MyWeapon->GetWeaponData()) return;
@@ -95,9 +102,9 @@ void AFightCharacter::NetMulticast_PlayMontage_Implementation(class UAnimMontage
 
 void AFightCharacter::StartWeaponCheck()
 {
-	if (!Weapon) return;
+	if (!WeaponComponent) return;
 
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
 	if (!MyWeapon) return;
 
 	MyWeapon->EnableCollisionCheck();
@@ -105,9 +112,9 @@ void AFightCharacter::StartWeaponCheck()
 
 void AFightCharacter::StopWeaponCheck()
 {
-	if (!Weapon) return;
+	if (!WeaponComponent) return;
 
-	AWeapon* MyWeapon = Cast<AWeapon>(Weapon->GetChildActor());
+	AWeapon* MyWeapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
 	if (!MyWeapon) return;
 
 	MyWeapon->DisableCollisionCheck();
