@@ -34,6 +34,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "NPCAIController")
 		FName TargetKey;
 
+	/**Name of blackboard key for damage raction state*/
+	UPROPERTY(EditDefaultsOnly, Category = "NPCAIController")
+		FName DamageRactionKey;
+
+	/**Timer for wait to finish take damge raction*/
+	FTimerHandle TakeDamageReactionTimer;
+
+	UFUNCTION()
+		void ResetTakeDamageReactionState();
+
 public:
 
 	/**Used to bind sensing functions, set behaior tree and blackboard*/
@@ -42,5 +52,7 @@ public:
 	/**PawnSense call it when see player*/
 	UFUNCTION()
 		void OnSeePlayer(class APawn* ObservedPawn);
+
+	void SetTakeDamageReactionForTime(float Time);
 
 };

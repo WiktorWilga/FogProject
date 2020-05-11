@@ -10,6 +10,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "FogCharacter.h"
 #include "EnemyCharacter.h"
+#include "TimerManager.h"
 
 
 AEnemyController::AEnemyController()
@@ -47,4 +48,16 @@ void AEnemyController::OnSeePlayer(APawn* ObservedPawn)
 	{
 		BlackboardComp->SetValueAsObject(TargetKey, ObservedCharacter);
 	}
+}
+
+void AEnemyController::SetTakeDamageReactionForTime(float Time)
+{
+	BlackboardComp->SetValueAsBool(DamageRactionKey, true);
+	GetWorld()->GetTimerManager().ClearTimer(TakeDamageReactionTimer);
+	GetWorld()->GetTimerManager().SetTimer(TakeDamageReactionTimer, this, &AEnemyController::ResetTakeDamageReactionState, Time, false);
+}
+
+void AEnemyController::ResetTakeDamageReactionState()
+{
+	BlackboardComp->SetValueAsBool(DamageRactionKey, false);
 }

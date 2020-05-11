@@ -5,6 +5,9 @@
 #include "Weapon.h"
 #include "WeaponStructures.h"
 #include "FogCharacter.h"
+#include "EnemyController.h"
+#include "BrainComponent.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -59,4 +62,19 @@ void AEnemyCharacter::SetupEnemyWeapon()
 bool AEnemyCharacter::IsEnemy(AFightCharacter* Character)
 {
 	return Character->IsA<AFogCharacter>();
+}
+
+void AEnemyCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
+						AActor* DamageCauser)
+{
+	AEnemyController* MyController = Cast<AEnemyController>(Controller);
+
+	if (TakeDamageReactionAnim && MyController)
+	{
+		float AnimTime = TakeDamageReactionAnim->GetPlayLength() / TakeDamageReactionAnim->RateScale;
+		MyController->SetTakeDamageReactionForTime(AnimTime);
+		NetMulticast_PlayMontage(TakeDamageReactionAnim);
+	}
+
+	Super::TakeDamage(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
 }

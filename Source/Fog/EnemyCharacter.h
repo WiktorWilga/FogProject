@@ -35,7 +35,13 @@ public:
 	/**Return true if givan character is this characer enemy*/
 	virtual bool IsEnemy(AFightCharacter* Character) override;
 
+	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+			class AController* InstigatedBy, AActor* DamageCauser) override;
+
 private:
+
+	UPROPERTY(EditAnywhere)
+		class UAnimMontage* TakeDamageReactionAnim;
 
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
 		TArray<FVector> TargetLocations;
