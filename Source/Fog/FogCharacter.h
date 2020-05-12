@@ -71,6 +71,10 @@ public:
 	/**Return true if givan character is this characer enemy*/
 	virtual bool IsEnemy(AFightCharacter* Character) override;
 
+	/**Start making dodge*/
+	UFUNCTION(Server, Reliable)
+	void Server_StartDodge();
+
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -112,6 +116,10 @@ private:
 	/**Reference to weapons data table*/
 	UPROPERTY(EditDefaultsOnly)
 		class UDataTable* WeaponDataTable;
+
+	/**How far/fast can character dodge*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		float DodgeStrength = 30000000.0f;
 
 };
 

@@ -208,3 +208,9 @@ bool AFogCharacter::IsEnemy(AFightCharacter* Character)
 {
 	return Character->IsA<AEnemyCharacter>();
 }
+
+void AFogCharacter::Server_StartDodge_Implementation()
+{
+	FVector DodgeDirection = GetVelocity().GetSafeNormal() * DodgeStrength;
+	GetCharacterMovement()->AddForce(DodgeDirection);
+}

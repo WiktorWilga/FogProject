@@ -32,6 +32,11 @@ protected:
 		void OnInteract();
 	UFUNCTION()
 		void OnAttack();
+
+	UFUNCTION()
+		void Dodge();
+
+	FVector DodgeDirection;
 };
 
 

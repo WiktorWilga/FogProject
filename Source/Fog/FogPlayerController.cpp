@@ -21,6 +21,10 @@ void AFogPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
+	/*if (!DodgeDirection.IsNearlyZero())
+	{
+		GetCharacter()->GetMovementComponent()->AddInputVector(DodgeDirection);
+	}*/
 }
 
 void AFogPlayerController::SetupInputComponent()
@@ -30,6 +34,7 @@ void AFogPlayerController::SetupInputComponent()
 
 	InputComponent->BindAction("Interaction", IE_Pressed, this, &AFogPlayerController::OnInteract);
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AFogPlayerController::OnAttack);
+	InputComponent->BindAction("Dodge", IE_Pressed, this, &AFogPlayerController::Dodge);
 
 	InputComponent->BindAxis("Forward", this, &AFogPlayerController::MoveForward);
 	InputComponent->BindAxis("Right", this, &AFogPlayerController::MoveRight);
@@ -67,4 +72,12 @@ void AFogPlayerController::OnAttack()
 	if (!FogCharacter) return;
 
 	FogCharacter->Server_PerformAttack();
+}
+
+void AFogPlayerController::Dodge()
+{
+	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+	if (!FogCharacter) return;
+
+	FogCharacter->Server_StartDodge();
 }
