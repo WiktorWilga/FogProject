@@ -21,10 +21,6 @@ void AFogPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
 
-	/*if (!DodgeDirection.IsNearlyZero())
-	{
-		GetCharacter()->GetMovementComponent()->AddInputVector(DodgeDirection);
-	}*/
 }
 
 void AFogPlayerController::SetupInputComponent()

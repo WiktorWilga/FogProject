@@ -46,6 +46,10 @@ public:
 
 	/**Return true if givan character is this characer enemy*/
 	virtual bool IsEnemy(AFightCharacter* Character) PURE_VIRTUAL(AFightCharacter::IsEnemy, return false;);
+	
+	/**Adding new ability to ability component*/
+	UFUNCTION(BlueprintCallable)
+		void AddAbility(TSubclassOf<class UGameplayAbility> AbilityClass);
 
 protected:
 
@@ -71,4 +75,8 @@ protected:
 	/**Play given montage on every machines*/
 	UFUNCTION(NetMulticast, Reliable)
 		void NetMulticast_PlayMontage(class UAnimMontage* AnimMontage);
+
+	/**Component for ability system*/
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		class UAbilitySystemComponent* AbilityComponent;
 };
