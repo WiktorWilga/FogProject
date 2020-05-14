@@ -9,6 +9,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Weapon.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
 
 // Sets default values
 AFightCharacter::AFightCharacter()
@@ -21,6 +23,8 @@ AFightCharacter::AFightCharacter()
 	FName SocketName("WeaponSocket");
 	WeaponComponent->SetupAttachment(GetMesh(), SocketName);
 	WeaponComponent->SetIsReplicated(true);
+
+	AbilityComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilityComponent");
 
 }
 
@@ -118,4 +122,16 @@ void AFightCharacter::StopWeaponCheck()
 	if (!MyWeapon) return;
 
 	MyWeapon->DisableCollisionCheck();
+}
+
+void AFightCharacter::AddAbility(TSubclassOf<UGameplayAbility> AbilityClass)
+{
+	if (AbilityComponent)
+	{
+		if (HasAuthority())
+		{
+			AbilityComponent->GiveAbility(FGameplayAbilitySpec(AbilityClass, 1, 0));
+		}
+		AbilityComponent->InitAbilityActorInfo(this, this);
+	}
 }
