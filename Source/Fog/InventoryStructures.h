@@ -11,7 +11,7 @@ enum class EInventoryType : uint8
 {
 	IT_Weapon, 
 	IT_Armor, 
-	IT_Food, 
+	IT_Spell, 
 	IT_Other
 };
 

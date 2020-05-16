@@ -10,6 +10,7 @@
 #include "Components/Overlay.h"
 #include "InventoryMenuElementWidget.h"
 #include "Components/WidgetSwitcher.h"
+#include "Components/HorizontalBox.h"
 
 bool UInventoryMenuWidget::Initialize()
 {
@@ -75,7 +76,7 @@ void UInventoryMenuWidget::AddElementToWrapBox(UInventoryMenuElementWidget* Elem
 	case EInventoryType::IT_Armor:
 		ArmorWrapBox->AddChildToWrapBox(Element);
 		break;
-	case EInventoryType::IT_Food:
+	case EInventoryType::IT_Spell:
 		FoodWrapBox->AddChildToWrapBox(Element);
 		break;
 	case EInventoryType::IT_Other:
@@ -121,7 +122,8 @@ void UInventoryMenuWidget::OnClickedElement(FName ItemName, FInventoryItem* Elem
 		Character->SetArmor(ElementItem);
 		SetSlot(ItemName, ElementItem);
 		break;
-	case EInventoryType::IT_Food:
+	case EInventoryType::IT_Spell:
+		SetSlot(ItemName, ElementItem);
 		break;
 	case EInventoryType::IT_Other:
 		break;
@@ -141,20 +143,20 @@ void UInventoryMenuWidget::SetSlot(FName ItemName, FInventoryItem* NewSlotItem)
 	case EInventoryType::IT_Weapon:
 		DesiredOverlay = ArmorOverlay;
 		break;
+	case EInventoryType::IT_Spell:
+		DesiredOverlay = GetFirstFreeSpellSlot();
+		break;
 	default:
 		DesiredOverlay = nullptr;
 	}
 
 	if (!DesiredOverlay) return;
 
-	for (UWidget* Child : DesiredOverlay->GetAllChildren())
+	UInventoryMenuElementWidget* CurrentWeapon = GetInventoryElemntInside(DesiredOverlay);
+	if (CurrentWeapon)
 	{
-		auto CurrentWeapon = Cast<UInventoryMenuElementWidget>(Child);
-		if (CurrentWeapon)
-		{
-			CurrentWeapon->SetData(ItemName, NewSlotItem, this);
-			return;
-		}
+		CurrentWeapon->SetData(ItemName, NewSlotItem, this);
+		return;
 	}
 
 	UInventoryMenuElementWidget* NewElement = CreateWidget<UInventoryMenuElementWidget>(this, ElementClass);
@@ -168,4 +170,29 @@ void UInventoryMenuWidget::SetCharacterWeapon(FName ItemName)
 	if (!Character) return;
 
 	Character->Server_SetWeapon(ItemName);
+}
+
+UOverlay* UInventoryMenuWidget::GetFirstFreeSpellSlot()
+{
+	if (!GetInventoryElemntInside(SpellOverlay1)) return SpellOverlay1;
+	if (!GetInventoryElemntInside(SpellOverlay2)) return SpellOverlay2;
+	if (!GetInventoryElemntInside(SpellOverlay3)) return SpellOverlay3;
+	if (!GetInventoryElemntInside(SpellOverlay4)) return SpellOverlay4;
+	return nullptr;
+}
+
+UInventoryMenuElementWidget* UInventoryMenuWidget::GetInventoryElemntInside(UOverlay* Overlay)
+{
+	if (!Overlay) return nullptr;
+
+	for (UWidget* Child : Overlay->GetAllChildren())
+	{
+		auto CurrentWeapon = Cast<UInventoryMenuElementWidget>(Child);
+		if (CurrentWeapon)
+		{
+			return CurrentWeapon;
+		}
+	}
+
+	return nullptr;
 }

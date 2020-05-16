@@ -51,6 +51,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 		void AddAbility(TSubclassOf<class UGameplayAbility> AbilityClass);
 
+	/**Set currently avaliable spells for character*/
+	void SetSelectedSpells(TArray<TSubclassOf<class UGameplayAbility>> InSelectedSpells);
+
 protected:
 
 	float Health;
@@ -79,4 +82,8 @@ protected:
 	/**Component for ability system*/
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UAbilitySystemComponent* AbilityComponent;
+
+	/**Spells which character can currently use*/
+	UPROPERTY()
+		TArray<TSubclassOf<class UGameplayAbility>> SelectedSpells;
 };

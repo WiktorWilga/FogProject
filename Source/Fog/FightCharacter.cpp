@@ -6,7 +6,6 @@
 #include "GameFramework/Controller.h"
 #include "Components/CapsuleComponent.h"
 #include "Animation/AnimMontage.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Animation/AnimInstance.h"
 #include "Weapon.h"
 #include "AbilitySystemComponent.h"
@@ -134,4 +133,9 @@ void AFightCharacter::AddAbility(TSubclassOf<UGameplayAbility> AbilityClass)
 		}
 		AbilityComponent->InitAbilityActorInfo(this, this);
 	}
+}
+
+void AFightCharacter::SetSelectedSpells(TArray<TSubclassOf<UGameplayAbility>> InSelectedSpells)
+{
+	SelectedSpells = InSelectedSpells;
 }

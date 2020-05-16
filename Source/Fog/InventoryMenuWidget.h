@@ -60,6 +60,21 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
 		class UOverlay* ArmorOverlay;
 
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+		class UHorizontalBox* SpellsSlotsHorizontalBox;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+		class UOverlay* SpellOverlay1;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+		class UOverlay* SpellOverlay2;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+		class UOverlay* SpellOverlay3;
+
+	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
+		class UOverlay* SpellOverlay4;
+
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UInventoryMenuElementWidget> ElementClass;
 
@@ -84,4 +99,7 @@ private:
 
 	void SetCharacterWeapon(FName ItemName);
 
+	class UOverlay* GetFirstFreeSpellSlot();
+
+	class UInventoryMenuElementWidget* GetInventoryElemntInside(class UOverlay* Overlay);
 };

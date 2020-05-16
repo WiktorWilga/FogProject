@@ -6,7 +6,7 @@
 #include "HeadMountedDisplayFunctionLibrary.h"
 #include "FogCharacter.h"
 #include "Engine/World.h"
-#include "InventoryMenuElementWidget.h"
+#include "InventoryMenuWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
 
 AFogPlayerController::AFogPlayerController()
@@ -31,6 +31,7 @@ void AFogPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Interaction", IE_Pressed, this, &AFogPlayerController::OnInteract);
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AFogPlayerController::OnAttack);
 	InputComponent->BindAction("Dodge", IE_Pressed, this, &AFogPlayerController::Dodge);
+	InputComponent->BindAction("OpenInventory", IE_Pressed, this, &AFogPlayerController::OnInventory);
 
 	InputComponent->BindAxis("Forward", this, &AFogPlayerController::MoveForward);
 	InputComponent->BindAxis("Right", this, &AFogPlayerController::MoveRight);
@@ -76,4 +77,28 @@ void AFogPlayerController::Dodge()
 	if (!FogCharacter) return;
 
 	FogCharacter->Server_StartDodge();
+}
+
+void AFogPlayerController::CreateInventoryMenu()
+{
+	if (!InventoryMenuClass) return;
+
+	InventoryMenuInstance = CreateWidget<UInventoryMenuWidget>(this, InventoryMenuClass);
+}
+
+void AFogPlayerController::OnInventory()
+{
+	if (!InventoryMenuInstance)
+	{
+		CreateInventoryMenu();
+	}
+	
+	if (InventoryMenuInstance->IsInViewport())
+	{
+		InventoryMenuInstance->RemoveFromParent();
+	}
+	else	
+	{
+		InventoryMenuInstance->AddToViewport();
+	}
 }

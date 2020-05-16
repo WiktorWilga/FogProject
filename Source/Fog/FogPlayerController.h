@@ -36,6 +36,16 @@ protected:
 	UFUNCTION()
 		void Dodge();
 
+	/**Inventory menu*/
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class UInventoryMenuWidget> InventoryMenuClass;
+	UPROPERTY()
+		class UInventoryMenuWidget* InventoryMenuInstance;
+	void CreateInventoryMenu();
+	UFUNCTION()
+		void OnInventory();
+	/****************/
+
 };
 
 
