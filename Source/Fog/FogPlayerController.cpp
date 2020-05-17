@@ -8,6 +8,9 @@
 #include "Engine/World.h"
 #include "InventoryMenuWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "FogHUDWidget.h"
+#include "SpellsHUDWidget.h"
+
 
 AFogPlayerController::AFogPlayerController()
 {
@@ -15,6 +18,17 @@ AFogPlayerController::AFogPlayerController()
 	DefaultMouseCursor = EMouseCursor::Crosshairs;
 
 	SetReplicates(true);
+}
+
+void AFogPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (IsLocalController())
+	{
+		CreateHUD();
+		HUDInstance->AddToViewport();
+	}
 }
 
 void AFogPlayerController::PlayerTick(float DeltaTime)
@@ -32,6 +46,8 @@ void AFogPlayerController::SetupInputComponent()
 	InputComponent->BindAction("Attack", IE_Pressed, this, &AFogPlayerController::OnAttack);
 	InputComponent->BindAction("Dodge", IE_Pressed, this, &AFogPlayerController::Dodge);
 	InputComponent->BindAction("OpenInventory", IE_Pressed, this, &AFogPlayerController::OnInventory);
+	InputComponent->BindAction("NextSpell", IE_Pressed, this, &AFogPlayerController::OnNextSpell);
+	InputComponent->BindAction("PreviousSpell", IE_Pressed, this, &AFogPlayerController::OnPreviousSpell);
 
 	InputComponent->BindAxis("Forward", this, &AFogPlayerController::MoveForward);
 	InputComponent->BindAxis("Right", this, &AFogPlayerController::MoveRight);
@@ -96,9 +112,42 @@ void AFogPlayerController::OnInventory()
 	if (InventoryMenuInstance->IsInViewport())
 	{
 		InventoryMenuInstance->RemoveFromParent();
+
+		SetHUDSpellsIcons(InventoryMenuInstance->GetSelectedSpelssIcons());
 	}
 	else	
 	{
 		InventoryMenuInstance->AddToViewport();
+	}
+}
+
+void AFogPlayerController::CreateHUD()
+{
+	if (!HUDClass) return;
+
+	HUDInstance = CreateWidget<UFogHUDWidget>(this, HUDClass);
+}
+
+void AFogPlayerController::SetHUDSpellsIcons(TArray<UTexture2D*> InSpellsIcons)
+{
+	if(HUDInstance && HUDInstance->WBP_SpellsHUD)
+	{
+		HUDInstance->WBP_SpellsHUD->SetSpells(InSpellsIcons);
+	}
+}
+
+void AFogPlayerController::OnNextSpell()
+{
+	if (HUDInstance && HUDInstance->WBP_SpellsHUD)
+	{
+		HUDInstance->WBP_SpellsHUD->NextSpell();
+	}
+}
+
+void AFogPlayerController::OnPreviousSpell()
+{
+	if (HUDInstance && HUDInstance->WBP_SpellsHUD)
+	{
+		HUDInstance->WBP_SpellsHUD->PreviousSpell();
 	}
 }

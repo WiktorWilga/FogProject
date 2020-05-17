@@ -24,3 +24,8 @@ FReply UInventoryMenuElementWidget::NativeOnMouseButtonDoubleClick(const FGeomet
 
 	return Super::NativeOnMouseButtonDoubleClick(InGeometry, InMouseEvent);
 }
+
+FInventoryItem* UInventoryMenuElementWidget::GetData()
+{
+	return ItemData;
+}

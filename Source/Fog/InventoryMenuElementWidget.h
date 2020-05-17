@@ -17,6 +17,7 @@ class FOG_API UInventoryMenuElementWidget : public UUserWidget
 public:
 
 	void SetData(FName Name, struct FInventoryItem* Item, class UInventoryMenuWidget* Parent);
+	struct FInventoryItem* GetData();
 
 protected:
 

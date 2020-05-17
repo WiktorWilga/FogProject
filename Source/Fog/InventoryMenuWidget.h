@@ -21,6 +21,8 @@ public:
 
 	void OnClickedElement(FName ItemName, struct FInventoryItem* ElementItem);
 
+	TArray<class UTexture2D*> GetSelectedSpelssIcons();
+
 protected:
 
 	void AddToScreen(ULocalPlayer* LocalPlayer, int32 ZOrder) override;
@@ -102,4 +104,5 @@ private:
 	class UOverlay* GetFirstFreeSpellSlot();
 
 	class UInventoryMenuElementWidget* GetInventoryElemntInside(class UOverlay* Overlay);
+
 };

@@ -14,7 +14,8 @@ class AFogPlayerController : public APlayerController
 public:
 	AFogPlayerController();
 
-protected:
+	void BeginPlay() override;
+
 	/** True if the controlled character should navigate to the mouse cursor. */
 	uint32 bMoveToMouseCursor : 1;
 
@@ -36,6 +37,11 @@ protected:
 	UFUNCTION()
 		void Dodge();
 
+	UFUNCTION()
+		void OnNextSpell();
+	UFUNCTION()
+		void OnPreviousSpell();
+
 	/**Inventory menu*/
 	UPROPERTY(EditDefaultsOnly)
 		TSubclassOf<class UInventoryMenuWidget> InventoryMenuClass;
@@ -45,6 +51,15 @@ protected:
 	UFUNCTION()
 		void OnInventory();
 	/****************/
+
+	/**HUD*/
+	UPROPERTY(EditDefaultsOnly)
+		TSubclassOf<class UFogHUDWidget> HUDClass;
+	UPROPERTY()
+		class UFogHUDWidget* HUDInstance;
+	void CreateHUD();
+	void SetHUDSpellsIcons(TArray<class UTexture2D*> InSpellsIcons);
+	/******/
 
 };
 

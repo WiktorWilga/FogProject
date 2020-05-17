@@ -196,3 +196,38 @@ UInventoryMenuElementWidget* UInventoryMenuWidget::GetInventoryElemntInside(UOve
 
 	return nullptr;
 }
+
+TArray<UTexture2D*> UInventoryMenuWidget::GetSelectedSpelssIcons()
+{
+	TArray<UTexture2D*> Icons;
+
+	UInventoryMenuElementWidget* First =
+	GetInventoryElemntInside(SpellOverlay1);
+	if (First)
+	{
+		Icons.Add(First->GetData()->Icon);
+	}
+
+	UInventoryMenuElementWidget* Second =
+	GetInventoryElemntInside(SpellOverlay2);
+	if (Second)
+	{
+		Icons.Add(Second->GetData()->Icon);
+	}
+
+	UInventoryMenuElementWidget* Third =
+	GetInventoryElemntInside(SpellOverlay3);
+	if (Third)
+	{
+		Icons.Add(Third->GetData()->Icon);
+	}
+
+	UInventoryMenuElementWidget* Fourth =
+	GetInventoryElemntInside(SpellOverlay4);
+	if (Fourth)
+	{
+		Icons.Add(Fourth->GetData()->Icon);
+	}
+
+	return Icons;
+}
