@@ -41,6 +41,8 @@ public:
 		void OnNextSpell();
 	UFUNCTION()
 		void OnPreviousSpell();
+	UFUNCTION()
+		void OnUseSpell();
 
 	/**Inventory menu*/
 	UPROPERTY(EditDefaultsOnly)

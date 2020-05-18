@@ -18,6 +18,7 @@ public:
 
 	void SetData(FName Name, struct FInventoryItem* Item, class UInventoryMenuWidget* Parent);
 	struct FInventoryItem* GetData();
+	FName GetItemName() { return ItemName; }
 
 protected:
 

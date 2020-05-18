@@ -48,6 +48,9 @@ public:
 	void AddPickUpObjectToInventory(FName PickUpName, uint32 Amount = 1);
 	void RemovePickUpObjectFromInventory(FName PickUpName, uint32 Amount = 1);
 
+	/** Return true if character has object of given name*/
+	bool HasItem(FName PickUpName);
+
 	/** Getter for character inventory*/
 	FORCEINLINE TArray<FInventoryItemWithCounter> GetInventory() { return Inventory; }
 
@@ -74,6 +77,22 @@ public:
 	/**Start making dodge*/
 	UFUNCTION(Server, Reliable)
 	void Server_StartDodge();
+
+	/**Set spells, when player close inventory*/
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_SetSelectedSpells(const TArray<FName>& SpellsNames);
+
+	/**Set previous spell as current*/
+	UFUNCTION(Server, Reliable)
+		void Server_PreviousSpell();
+
+	/**Set next spell as current*/
+	UFUNCTION(Server, Reliable)
+		void Server_NextSpell();
+
+	/** Use spell*/
+	UFUNCTION(Server, Reliable)
+	void Server_UseSelectedSpell();
 
 private:
 	/** Top down camera */
@@ -121,5 +140,18 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		float DodgeStrength = 30000000.0f;
 
+	/**Spells which character can currently use*/
+	UPROPERTY()
+	TArray<TSubclassOf<class UGameplayAbility>> SelectedSpells;
+
+	/**Currently selected spell, this one which player can actually use*/
+	uint8 CurrentSpell = 0;
+
+	/**Reference to spells data table*/
+	UPROPERTY(EditDefaultsOnly)
+		class UDataTable* SpellsDataTable;
+
+	/**Return specified index of spells array*/
+	uint8 GetShiftedIndex(int8 Offset);
 };
 

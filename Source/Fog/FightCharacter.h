@@ -83,7 +83,4 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UAbilitySystemComponent* AbilityComponent;
 
-	/**Spells which character can currently use*/
-	UPROPERTY()
-		TArray<TSubclassOf<class UGameplayAbility>> SelectedSpells;
 };

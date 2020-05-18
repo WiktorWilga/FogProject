@@ -231,3 +231,38 @@ TArray<UTexture2D*> UInventoryMenuWidget::GetSelectedSpelssIcons()
 
 	return Icons;
 }
+
+TArray<FName> UInventoryMenuWidget::GetSelectedSpellsNames()
+{
+	TArray<FName> SpellsNames;
+
+	UInventoryMenuElementWidget* First =
+	GetInventoryElemntInside(SpellOverlay1);
+	if (First)
+	{
+		SpellsNames.Add(First->GetItemName());
+	}
+
+	UInventoryMenuElementWidget* Second =
+	GetInventoryElemntInside(SpellOverlay2);
+	if (Second)
+	{
+		SpellsNames.Add(Second->GetItemName());
+	}
+
+	UInventoryMenuElementWidget* Third =
+	GetInventoryElemntInside(SpellOverlay3);
+	if (Third)
+	{
+		SpellsNames.Add(Third->GetItemName());
+	}
+
+	UInventoryMenuElementWidget* Fourth =
+	GetInventoryElemntInside(SpellOverlay4);
+	if (Fourth)
+	{
+		SpellsNames.Add(Fourth->GetItemName());
+	}
+
+	return SpellsNames;
+}

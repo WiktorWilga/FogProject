@@ -135,7 +135,3 @@ void AFightCharacter::AddAbility(TSubclassOf<UGameplayAbility> AbilityClass)
 	}
 }
 
-void AFightCharacter::SetSelectedSpells(TArray<TSubclassOf<UGameplayAbility>> InSelectedSpells)
-{
-	SelectedSpells = InSelectedSpells;
-}

@@ -22,6 +22,7 @@ public:
 	void OnClickedElement(FName ItemName, struct FInventoryItem* ElementItem);
 
 	TArray<class UTexture2D*> GetSelectedSpelssIcons();
+	TArray<FName> GetSelectedSpellsNames();
 
 protected:
 

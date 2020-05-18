@@ -48,6 +48,7 @@ void AFogPlayerController::SetupInputComponent()
 	InputComponent->BindAction("OpenInventory", IE_Pressed, this, &AFogPlayerController::OnInventory);
 	InputComponent->BindAction("NextSpell", IE_Pressed, this, &AFogPlayerController::OnNextSpell);
 	InputComponent->BindAction("PreviousSpell", IE_Pressed, this, &AFogPlayerController::OnPreviousSpell);
+	InputComponent->BindAction("UseSpell", IE_Pressed, this, &AFogPlayerController::OnUseSpell);
 
 	InputComponent->BindAxis("Forward", this, &AFogPlayerController::MoveForward);
 	InputComponent->BindAxis("Right", this, &AFogPlayerController::MoveRight);
@@ -114,6 +115,12 @@ void AFogPlayerController::OnInventory()
 		InventoryMenuInstance->RemoveFromParent();
 
 		SetHUDSpellsIcons(InventoryMenuInstance->GetSelectedSpelssIcons());
+
+		auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+		if (FogCharacter)
+		{
+			FogCharacter->Server_SetSelectedSpells(InventoryMenuInstance->GetSelectedSpellsNames());
+		}
 	}
 	else	
 	{
@@ -142,6 +149,12 @@ void AFogPlayerController::OnNextSpell()
 	{
 		HUDInstance->WBP_SpellsHUD->NextSpell();
 	}
+
+	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+	if (FogCharacter)
+	{
+		FogCharacter->Server_NextSpell();
+	}
 }
 
 void AFogPlayerController::OnPreviousSpell()
@@ -149,5 +162,20 @@ void AFogPlayerController::OnPreviousSpell()
 	if (HUDInstance && HUDInstance->WBP_SpellsHUD)
 	{
 		HUDInstance->WBP_SpellsHUD->PreviousSpell();
+	}
+
+	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+	if (FogCharacter)
+	{
+		FogCharacter->Server_PreviousSpell();
+	}
+}
+
+void AFogPlayerController::OnUseSpell()
+{
+	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
+	if (FogCharacter)
+	{
+		FogCharacter->Server_UseSelectedSpell();
 	}
 }

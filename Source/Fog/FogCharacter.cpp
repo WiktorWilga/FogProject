@@ -22,6 +22,7 @@
 #include "Components/ChildActorComponent.h"
 #include "Weapon.h"
 #include "EnemyCharacter.h"
+#include "SpellStructures.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -153,6 +154,15 @@ void AFogCharacter::RemovePickUpObjectFromInventory(FName PickUpName, uint32 Amo
 	}
 }
 
+bool AFogCharacter::HasItem(FName PickUpName)
+{
+	for (FInventoryItemWithCounter Item : Inventory)
+	{
+		if (Item.Name.Compare(PickUpName) == 0) return true;
+	}
+	return false;
+}
+
 int32 AFogCharacter::GetInventoryItemIndex(FName Name)
 {
 	for (int32 i = 0; i < Inventory.Num(); ++i)
@@ -213,4 +223,64 @@ void AFogCharacter::Server_StartDodge_Implementation()
 {
 	FVector DodgeDirection = GetVelocity().GetSafeNormal() * DodgeStrength;
 	GetCharacterMovement()->AddForce(DodgeDirection);
+}
+
+void AFogCharacter::Server_SetSelectedSpells_Implementation(const TArray<FName>& SpellsNames)
+{
+	//@todo change to set spells only locally and check if player is cheatying only when he is use spell
+
+	SelectedSpells.Empty();
+
+	for (FName Name : SpellsNames)
+	{
+		const FString Context;
+		FSpellInfo* SpellInfo = SpellsDataTable->FindRow<FSpellInfo>(Name, Context);
+		if (!SpellInfo) continue;
+
+		SelectedSpells.Add(SpellInfo->Ability);
+	}
+}
+
+bool AFogCharacter::Server_SetSelectedSpells_Validate(const TArray<FName>& SpellsNames)
+{
+	for (FName Name : SpellsNames)
+	{
+		if (!HasItem(Name)) return false;
+	}
+
+	return true;
+}
+
+void AFogCharacter::Server_PreviousSpell_Implementation()
+{
+	CurrentSpell = GetShiftedIndex(-1);
+}
+
+void AFogCharacter::Server_NextSpell_Implementation()
+{
+	CurrentSpell = GetShiftedIndex(1);
+}
+
+uint8 AFogCharacter::GetShiftedIndex(int8 Offset)
+{
+	int16 DesiredIndex = CurrentSpell + Offset;
+
+	if (DesiredIndex < 0)
+	{
+		DesiredIndex = SelectedSpells.Num() - 1;
+	}
+	else if (DesiredIndex >= SelectedSpells.Num())
+	{
+		DesiredIndex = 0;
+	}
+
+	return DesiredIndex;
+}
+
+void AFogCharacter::Server_UseSelectedSpell_Implementation()
+{
+
+	if (!SelectedSpells.Num()) return;
+
+	UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentSpell);
 }
