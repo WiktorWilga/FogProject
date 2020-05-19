@@ -23,6 +23,8 @@
 #include "Weapon.h"
 #include "EnemyCharacter.h"
 #include "SpellStructures.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -238,6 +240,7 @@ void AFogCharacter::Server_SetSelectedSpells_Implementation(const TArray<FName>&
 		if (!SpellInfo) continue;
 
 		SelectedSpells.Add(SpellInfo->Ability);
+		AddAbility(SpellInfo->Ability);
 	}
 }
 
@@ -282,5 +285,6 @@ void AFogCharacter::Server_UseSelectedSpell_Implementation()
 
 	if (!SelectedSpells.Num()) return;
 
-	UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentSpell);
+	AbilityComponent->TryActivateAbilityByClass(SelectedSpells[CurrentSpell]);
+
 }
