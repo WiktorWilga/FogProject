@@ -119,7 +119,7 @@ void AFogPlayerController::OnInventory()
 		auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
 		if (FogCharacter)
 		{
-			FogCharacter->Server_SetSelectedSpells(InventoryMenuInstance->GetSelectedSpellsNames());
+			FogCharacter->SetSelectedSpells(InventoryMenuInstance->GetSelectedSpellsNames());
 		}
 	}
 	else	
@@ -153,7 +153,7 @@ void AFogPlayerController::OnNextSpell()
 	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
 	if (FogCharacter)
 	{
-		FogCharacter->Server_NextSpell();
+		FogCharacter->NextSpell();
 	}
 }
 
@@ -167,7 +167,7 @@ void AFogPlayerController::OnPreviousSpell()
 	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
 	if (FogCharacter)
 	{
-		FogCharacter->Server_PreviousSpell();
+		FogCharacter->PreviousSpell();
 	}
 }
 
@@ -176,6 +176,6 @@ void AFogPlayerController::OnUseSpell()
 	auto FogCharacter = Cast<AFogCharacter>(GetCharacter());
 	if (FogCharacter)
 	{
-		FogCharacter->Server_UseSelectedSpell();
+		FogCharacter->Client_UseSelectedSpell();
 	}
 }

@@ -47,9 +47,10 @@ public:
 	/**Return true if givan character is this characer enemy*/
 	virtual bool IsEnemy(AFightCharacter* Character) PURE_VIRTUAL(AFightCharacter::IsEnemy, return false;);
 	
-	/**Adding new ability to ability component*/
-	UFUNCTION(BlueprintCallable)
-		void AddAbility(TSubclassOf<class UGameplayAbility> AbilityClass);
+	/**Adding new ability to ability component
+	here isn't validation, because we do it on use spell*/
+	UFUNCTION(BlueprintCallable, Server, Reliable)
+		void Server_AddAbility(TSubclassOf<class UGameplayAbility> AbilityClass);
 
 	/**Set currently avaliable spells for character*/
 	void SetSelectedSpells(TArray<TSubclassOf<class UGameplayAbility>> InSelectedSpells);

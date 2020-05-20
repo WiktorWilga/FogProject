@@ -79,20 +79,20 @@ public:
 	void Server_StartDodge();
 
 	/**Set spells, when player close inventory*/
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SetSelectedSpells(const TArray<FName>& SpellsNames);
+	void SetSelectedSpells(TArray<FName> SpellsNames);
 
 	/**Set previous spell as current*/
-	UFUNCTION(Server, Reliable)
-		void Server_PreviousSpell();
+	void PreviousSpell();
 
 	/**Set next spell as current*/
-	UFUNCTION(Server, Reliable)
-		void Server_NextSpell();
+	void NextSpell();
+
+	/**Try run on selected spell; send request to server*/
+	void Client_UseSelectedSpell();
 
 	/** Use spell*/
-	UFUNCTION(Server, Reliable)
-	void Server_UseSelectedSpell();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void Server_UseSpell(FName Spell);
 
 private:
 	/** Top down camera */
@@ -142,7 +142,7 @@ private:
 
 	/**Spells which character can currently use*/
 	UPROPERTY()
-	TArray<TSubclassOf<class UGameplayAbility>> SelectedSpells;
+	TArray<FName> SelectedSpells;
 
 	/**Currently selected spell, this one which player can actually use*/
 	uint8 CurrentSpell = 0;

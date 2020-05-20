@@ -123,7 +123,7 @@ void AFightCharacter::StopWeaponCheck()
 	MyWeapon->DisableCollisionCheck();
 }
 
-void AFightCharacter::AddAbility(TSubclassOf<UGameplayAbility> AbilityClass)
+void AFightCharacter::Server_AddAbility_Implementation(TSubclassOf<UGameplayAbility> AbilityClass)
 {
 	if (AbilityComponent)
 	{
@@ -134,4 +134,3 @@ void AFightCharacter::AddAbility(TSubclassOf<UGameplayAbility> AbilityClass)
 		AbilityComponent->InitAbilityActorInfo(this, this);
 	}
 }
-

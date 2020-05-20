@@ -227,39 +227,28 @@ void AFogCharacter::Server_StartDodge_Implementation()
 	GetCharacterMovement()->AddForce(DodgeDirection);
 }
 
-void AFogCharacter::Server_SetSelectedSpells_Implementation(const TArray<FName>& SpellsNames)
+void AFogCharacter::SetSelectedSpells(TArray<FName> SpellsNames)
 {
-	//@todo change to set spells only locally and check if player is cheatying only when he is use spell
-
 	SelectedSpells.Empty();
 
-	for (FName Name : SpellsNames)
+	for (FName Spell : SpellsNames)
 	{
 		const FString Context;
-		FSpellInfo* SpellInfo = SpellsDataTable->FindRow<FSpellInfo>(Name, Context);
-		if (!SpellInfo) continue;
+		FSpellInfo* SpellInfo = SpellsDataTable->FindRow<FSpellInfo>(Spell, Context);
+		if (!SpellInfo) return;
 
-		SelectedSpells.Add(SpellInfo->Ability);
-		AddAbility(SpellInfo->Ability);
-	}
-}
-
-bool AFogCharacter::Server_SetSelectedSpells_Validate(const TArray<FName>& SpellsNames)
-{
-	for (FName Name : SpellsNames)
-	{
-		if (!HasItem(Name)) return false;
+		Server_AddAbility(SpellInfo->Ability);
 	}
 
-	return true;
+	SelectedSpells = SpellsNames;
 }
 
-void AFogCharacter::Server_PreviousSpell_Implementation()
+void AFogCharacter::PreviousSpell()
 {
 	CurrentSpell = GetShiftedIndex(-1);
 }
 
-void AFogCharacter::Server_NextSpell_Implementation()
+void AFogCharacter::NextSpell()
 {
 	CurrentSpell = GetShiftedIndex(1);
 }
@@ -280,11 +269,28 @@ uint8 AFogCharacter::GetShiftedIndex(int8 Offset)
 	return DesiredIndex;
 }
 
-void AFogCharacter::Server_UseSelectedSpell_Implementation()
+void AFogCharacter::Client_UseSelectedSpell()
 {
-
 	if (!SelectedSpells.Num()) return;
 
-	AbilityComponent->TryActivateAbilityByClass(SelectedSpells[CurrentSpell]);
+	Server_UseSpell(SelectedSpells[CurrentSpell]);
+}
 
+void AFogCharacter::Server_UseSpell_Implementation(FName Spell)
+{
+	const FString Context;
+	FSpellInfo* SpellInfo = SpellsDataTable->FindRow<FSpellInfo>(Spell, Context);
+	if (!SpellInfo) return;
+
+	AbilityComponent->TryActivateAbilityByClass(SpellInfo->Ability);
+}
+
+bool AFogCharacter::Server_UseSpell_Validate(FName Spell)
+{
+	for (FInventoryItemWithCounter Item : Inventory)
+	{
+		if (Item.Name.Compare(Spell) == 0) return true;
+	}
+
+	return false;
 }
