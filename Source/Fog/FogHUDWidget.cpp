@@ -2,4 +2,12 @@
 
 
 #include "FogHUDWidget.h"
+#include "HealthBarWidget.h"
 
+void UFogHUDWidget::SetHealthPercent(float Percent)
+{
+	if (WBP_HealthBar)
+	{
+		WBP_HealthBar->SetHealthPercent(Percent);
+	}
+}

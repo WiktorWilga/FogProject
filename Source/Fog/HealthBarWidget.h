@@ -4,24 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "FogHUDWidget.generated.h"
+#include "HealthBarWidget.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class FOG_API UFogHUDWidget : public UUserWidget
+class FOG_API UHealthBarWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
 
 	void SetHealthPercent(float Percent);
+	
+private:
 
 	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-		class USpellsHUDWidget* WBP_SpellsHUD;
-
-	UPROPERTY(EditDefaultsOnly, meta = (BindWidget))
-		class UHealthBarWidget* WBP_HealthBar;
-
+		class UProgressBar* HealthProgressBar;
 };

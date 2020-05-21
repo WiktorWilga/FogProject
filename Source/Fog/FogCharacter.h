@@ -94,6 +94,10 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UseSpell(FName Spell);
 
+	/**Add new functionality to refresh client healt widget*/
+	void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+		class AController* InstigatedBy, AActor* DamageCauser) override;
+
 private:
 	/** Top down camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
@@ -153,5 +157,10 @@ private:
 
 	/**Return specified index of spells array*/
 	uint8 GetShiftedIndex(int8 Offset);
+
+	/**Called to refresh client's hud health bar*/
+	UFUNCTION(Client, Reliable)
+		void Client_RefreshHealthWidget(float CurrentPercent);
+
 };
 

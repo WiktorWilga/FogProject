@@ -25,6 +25,8 @@
 #include "SpellStructures.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
+#include "FogPlayerController.h"
+#include "FogHUDWidget.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -293,4 +295,20 @@ bool AFogCharacter::Server_UseSpell_Validate(FName Spell)
 	}
 
 	return false;
+}
+
+void AFogCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	Super::TakeDamage(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
+
+	Client_RefreshHealthWidget(Health / MaxHealth);
+}
+
+void AFogCharacter::Client_RefreshHealthWidget_Implementation(float CurrentPercent)
+{
+	auto FogPlayerController = Cast<AFogPlayerController>(GetController());
+	if (FogPlayerController && FogPlayerController->HUDInstance)
+	{
+		FogPlayerController->HUDInstance->SetHealthPercent(CurrentPercent);
+	}
 }

@@ -31,6 +31,17 @@ void AFogPlayerController::BeginPlay()
 	}
 }
 
+void AFogPlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+
+	AFogCharacter* FogCharacter = Cast<AFogCharacter>(InPawn);
+	if (FogCharacter)
+	{
+		FogCharacter->DeadDelegate.AddUObject(this, &AFogPlayerController::Client_CleanUpAfterCharacterDead);
+	}
+}
+
 void AFogPlayerController::PlayerTick(float DeltaTime)
 {
 	Super::PlayerTick(DeltaTime);
@@ -177,5 +188,13 @@ void AFogPlayerController::OnUseSpell()
 	if (FogCharacter)
 	{
 		FogCharacter->Client_UseSelectedSpell();
+	}
+}
+
+void AFogPlayerController::Client_CleanUpAfterCharacterDead_Implementation()
+{
+	if (HUDInstance)
+	{
+		HUDInstance->SetHealthPercent(0.0f);
 	}
 }

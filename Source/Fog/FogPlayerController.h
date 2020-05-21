@@ -63,6 +63,10 @@ public:
 	void SetHUDSpellsIcons(TArray<class UTexture2D*> InSpellsIcons);
 	/******/
 
+	UFUNCTION(Client, Reliable)
+		void Client_CleanUpAfterCharacterDead();
+
+	void OnPossess(APawn* InPawn) override;
 };
 
 

@@ -73,6 +73,10 @@ void AFightCharacter::NetMulticast_Death_Implementation()
 
 void AFightCharacter::Server_Death_Implementation()
 {
+	if (DeadDelegate.IsBound())
+	{
+		DeadDelegate.Broadcast();
+	}
 	Controller->UnPossess();
 }
 

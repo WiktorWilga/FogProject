@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "FightCharacter.generated.h"
 
+DECLARE_MULTICAST_DELEGATE(FCharacterDeadDelegate);
+
 UCLASS(Abstract)
 class FOG_API AFightCharacter : public ACharacter
 {
@@ -54,6 +56,9 @@ public:
 
 	/**Set currently avaliable spells for character*/
 	void SetSelectedSpells(TArray<TSubclassOf<class UGameplayAbility>> InSelectedSpells);
+
+	/**Delegate called when character dead*/
+	FCharacterDeadDelegate DeadDelegate;
 
 protected:
 
