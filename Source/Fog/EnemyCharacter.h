@@ -38,7 +38,13 @@ public:
 	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 			class AController* InstigatedBy, AActor* DamageCauser) override;
 
+	UPROPERTY(EditAnywhere)
+		TSubclassOf<class UUserWidget> HealthWidgetClass;
+
 private:
+
+	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, meta = (AllowPrivateAccess = true))
+		class UWidgetComponent* HealthWidget;
 
 	UPROPERTY(EditAnywhere)
 		class UAnimMontage* TakeDamageReactionAnim;
@@ -57,4 +63,8 @@ private:
 	/** Reference to weapon data table row*/
 	UPROPERTY(EditAnywhere)
 		FDataTableRowHandle WeaponRef;
+
+	/**Set health bar widget value*/
+	UFUNCTION(NetMulticast, Unreliable)
+		void NetMulticast_RefreshHealthBar(float Percent);
 };

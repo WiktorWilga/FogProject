@@ -8,6 +8,8 @@
 #include "EnemyController.h"
 #include "BrainComponent.h"
 #include "Animation/AnimMontage.h"
+#include "Components/WidgetComponent.h"
+#include "HealthBarWidget.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -15,6 +17,9 @@ AEnemyCharacter::AEnemyCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("HealthWidget"));
+	HealthWidget->SetVisibility(true);
+	HealthWidget->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
@@ -25,6 +30,8 @@ void AEnemyCharacter::BeginPlay()
 	OffsetLocation = GetActorLocation();
 
 	SetupEnemyWeapon();
+
+	HealthWidget->SetWidgetClass(HealthWidgetClass);
 }
 
 // Called every frame
@@ -75,6 +82,26 @@ void AEnemyCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDama
 		MyController->SetTakeDamageReactionForTime(AnimTime);
 		NetMulticast_PlayMontage(TakeDamageReactionAnim);
 	}
-
+	
 	Super::TakeDamage(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
+
+	NetMulticast_RefreshHealthBar(Health / MaxHealth);
+}
+
+void AEnemyCharacter::NetMulticast_RefreshHealthBar_Implementation(float Percent)
+{
+	UHealthBarWidget* HealthBar = Cast<UHealthBarWidget>(HealthWidget->GetUserWidgetObject());
+	if (HealthBar)
+	{
+		HealthBar->SetHealthPercent(Percent);
+
+		if (Percent <= 0.0f)
+		{
+			HealthWidget->SetVisibility(false);
+		}
+		else //for situation when smt goes wrong and for moment client hasn't got true info
+		{
+			HealthWidget->SetVisibility(true);
+		}
+	}
 }
