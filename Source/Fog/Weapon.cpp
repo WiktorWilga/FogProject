@@ -64,14 +64,16 @@ void AWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AFightCharacter* MyCharacter = Cast<AFightCharacter>(GetParentActor());
-	if (!MyCharacter) return;
+	if (!MyCharacter || !MyCharacter->AbilityComponent) return;
 
 	AFightCharacter* AttackedCharacter = Cast<AFightCharacter>(OtherActor);
-	if (!AttackedCharacter) return;
+	if (!AttackedCharacter || !AttackedCharacter->AbilityComponent) return;
 
 	if (MyCharacter->IsEnemy(AttackedCharacter))
 	{
-		UGameplayStatics::ApplyDamage(AttackedCharacter, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
+		//UGameplayStatics::ApplyDamage(AttackedCharacter, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
+		MyCharacter->AbilityComponent->ApplyGameplayEffectToTarget(MyCharacter->MeleeAttackDamageGameplayEffect.GetDefaultObject(),
+																	AttackedCharacter->AbilityComponent);
 	}
 
 }

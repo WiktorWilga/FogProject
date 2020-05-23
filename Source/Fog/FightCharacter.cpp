@@ -10,6 +10,8 @@
 #include "Weapon.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
+#include "FogAttributeSet.h"
+#include "WeaponStructures.h"
 
 // Sets default values
 AFightCharacter::AFightCharacter()
@@ -24,7 +26,7 @@ AFightCharacter::AFightCharacter()
 	WeaponComponent->SetIsReplicated(true);
 
 	AbilityComponent = CreateDefaultSubobject<UAbilitySystemComponent>("AbilityComponent");
-
+	FogAttributeSetComponent = CreateDefaultSubobject<UFogAttributeSet>(TEXT("FogAttributeSetComponent"));
 }
 
 // Called when the game starts or when spawned
@@ -35,6 +37,13 @@ void AFightCharacter::BeginPlay()
 	Health = MaxHealth;
 
 	OnTakeAnyDamage.AddDynamic(this, &AFightCharacter::TakeDamage);
+
+	FogAttributeSetComponent->HealthChanged.AddDynamic(this, &AFightCharacter::HealthChange);
+}
+
+void AFightCharacter::HealthChange(float Current, float Max)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Delegate broadcast, %f, %f"), Current, Max);
 }
 
 // Called every frame
@@ -60,7 +69,12 @@ void AFightCharacter::TakeDamage(AActor* DamagedActor, float Damage, const class
 		Server_Death();
 		NetMulticast_Death();
 	}
+}
 
+void AFightCharacter::OnDead()
+{
+	Server_Death();
+	NetMulticast_Death();
 }
 
 void AFightCharacter::NetMulticast_Death_Implementation()
@@ -138,3 +152,28 @@ void AFightCharacter::Server_AddAbility_Implementation(TSubclassOf<UGameplayAbil
 		AbilityComponent->InitAbilityActorInfo(this, this);
 	}
 }
+
+void AFightCharacter::AddGameplayTag(FGameplayTag Tag)
+{
+	GetAbilitySystemComponent()->AddLooseGameplayTag(Tag);
+	GetAbilitySystemComponent()->SetTagMapCount(Tag, 1);
+}
+
+void AFightCharacter::RemoveGamepalyTag(FGameplayTag Tag)
+{
+	GetAbilitySystemComponent()->RemoveLooseGameplayTag(Tag);
+}
+
+UAbilitySystemComponent* AFightCharacter::GetAbilitySystemComponent() const
+{
+	return AbilityComponent;
+}
+
+float AFightCharacter::GetWeaponDamge()
+{
+	AWeapon* Weapon = Cast<AWeapon>(WeaponComponent->GetChildActor());
+	if (!Weapon || !Weapon->GetWeaponData()) return 0.0f;
+
+	return Weapon->GetWeaponData()->Damage;
+}
+

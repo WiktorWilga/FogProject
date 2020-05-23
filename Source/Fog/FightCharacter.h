@@ -4,12 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "AbilitySystemInterface.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
 #include "FightCharacter.generated.h"
 
 DECLARE_MULTICAST_DELEGATE(FCharacterDeadDelegate);
 
 UCLASS(Abstract)
-class FOG_API AFightCharacter : public ACharacter
+class FOG_API AFightCharacter : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -54,11 +57,42 @@ public:
 	UFUNCTION(BlueprintCallable, Server, Reliable)
 		void Server_AddAbility(TSubclassOf<class UGameplayAbility> AbilityClass);
 
+	/**Container of charcter attributes eg health*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+		class UFogAttributeSet* FogAttributeSetComponent;
+
 	/**Set currently avaliable spells for character*/
 	void SetSelectedSpells(TArray<TSubclassOf<class UGameplayAbility>> InSelectedSpells);
 
 	/**Delegate called when character dead*/
 	FCharacterDeadDelegate DeadDelegate;
+
+	/**Add specified tag to character*/
+	UFUNCTION(BlueprintCallable)
+	void AddGameplayTag(FGameplayTag Tag);
+
+	/**Remove specified tag from character*/
+	UFUNCTION(BlueprintCallable)
+	void RemoveGamepalyTag(FGameplayTag Tag);
+
+	/**Override from IAbilitySystemInterface, return character's ability component*/
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	UFUNCTION()
+		void HealthChange(float Current, float Max);
+
+	/**Gameplay effect executed when character take melee damage*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		TSubclassOf<UGameplayEffect> MeleeAttackDamageGameplayEffect;
+
+	/**Return damage making by current character's weapon*/
+	float GetWeaponDamge();
+
+	/**Component for ability system*/
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		class UAbilitySystemComponent* AbilityComponent;
+
+	void OnDead();
 
 protected:
 
@@ -84,9 +118,5 @@ protected:
 	/**Play given montage on every machines*/
 	UFUNCTION(NetMulticast, Reliable)
 		void NetMulticast_PlayMontage(class UAnimMontage* AnimMontage);
-
-	/**Component for ability system*/
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class UAbilitySystemComponent* AbilityComponent;
 
 };
