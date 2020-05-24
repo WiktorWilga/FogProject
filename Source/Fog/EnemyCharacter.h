@@ -35,19 +35,24 @@ public:
 	/**Return true if givan character is this characer enemy*/
 	virtual bool IsEnemy(AFightCharacter* Character) override;
 
-	virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-			class AController* InstigatedBy, AActor* DamageCauser) override;
+	//deprecated - now Gameplay Ability System is in use
+	/*virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+			class AController* InstigatedBy, AActor* DamageCauser) override;*/
 
 	UPROPERTY(EditAnywhere)
 		TSubclassOf<class UUserWidget> HealthWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		class UAnimMontage* TakeDamageReactionAnim;
+
+	/**Stop enemy for time when TakeDamageReaction is playing*/
+	virtual void MakeTakeDamageReaction() override;
 
 private:
 
 	UPROPERTY(BlueprintReadOnly, VisibleDefaultsOnly, meta = (AllowPrivateAccess = true))
 		class UWidgetComponent* HealthWidget;
 
-	UPROPERTY(EditAnywhere)
-		class UAnimMontage* TakeDamageReactionAnim;
 
 	UPROPERTY(EditAnywhere, meta = (MakeEditWidget = true))
 		TArray<FVector> TargetLocations;
@@ -66,5 +71,5 @@ private:
 
 	/**Set health bar widget value*/
 	UFUNCTION(NetMulticast, Unreliable)
-		void NetMulticast_RefreshHealthBar(float Percent);
+		void NetMulticast_RefreshHealthBar(float Current, float Max);
 };

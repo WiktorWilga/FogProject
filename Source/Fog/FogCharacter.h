@@ -94,9 +94,12 @@ public:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_UseSpell(FName Spell);
 
-	/**Add new functionality to refresh client healt widget*/
-	void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-		class AController* InstigatedBy, AActor* DamageCauser) override;
+	//deprecated - now Gameplay Ability System is in use/**Add new functionality to refresh client healt widget*/
+	/*void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+		class AController* InstigatedBy, AActor* DamageCauser) override;*/
+
+	/**Player's character dont't do any special behavior on take damage*/
+	virtual void MakeTakeDamageReaction() override {};
 
 private:
 	/** Top down camera */
@@ -160,7 +163,7 @@ private:
 
 	/**Called to refresh client's hud health bar*/
 	UFUNCTION(Client, Reliable)
-		void Client_RefreshHealthWidget(float CurrentPercent);
+		void Client_RefreshHealthWidget(float Current, float Max);
 
 };
 

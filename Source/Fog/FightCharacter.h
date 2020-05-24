@@ -31,9 +31,10 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	UFUNCTION()
+	//deprecated - now Gameplay Ability System is in use
+	/*UFUNCTION()
 		virtual void TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
-			class AController* InstigatedBy, AActor* DamageCauser);
+			class AController* InstigatedBy, AActor* DamageCauser);*/
 
 	UFUNCTION(NetMulticast, Reliable)
 	virtual void NetMulticast_Death();
@@ -78,9 +79,6 @@ public:
 	/**Override from IAbilitySystemInterface, return character's ability component*/
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
-	UFUNCTION()
-		void HealthChange(float Current, float Max);
-
 	/**Gameplay effect executed when character take melee damage*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		TSubclassOf<UGameplayEffect> MeleeAttackDamageGameplayEffect;
@@ -92,7 +90,11 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UAbilitySystemComponent* AbilityComponent;
 
-	void OnDead();
+	/**Called form AttributeSet when health dropped to zero*/
+	void Dead();
+
+	/**Make reaction for hit by weapon, it is important for gameplay, so it can't be in gameplay cue*/
+	virtual void MakeTakeDamageReaction() PURE_VIRTUAL(AFightCharacter::MakeTakeDamageReaction, ;);
 
 protected:
 

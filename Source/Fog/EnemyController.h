@@ -53,6 +53,8 @@ public:
 	UFUNCTION()
 		void OnSeePlayer(class APawn* ObservedPawn);
 
+	/**When it is active character cant do anything*/
+	UFUNCTION(BlueprintCallable)
 	void SetTakeDamageReactionForTime(float Time);
 
 };

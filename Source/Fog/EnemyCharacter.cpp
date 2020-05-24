@@ -10,6 +10,7 @@
 #include "Animation/AnimMontage.h"
 #include "Components/WidgetComponent.h"
 #include "HealthBarWidget.h"
+#include "FogAttributeSet.h"
 
 // Sets default values
 AEnemyCharacter::AEnemyCharacter()
@@ -26,6 +27,8 @@ AEnemyCharacter::AEnemyCharacter()
 void AEnemyCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FogAttributeSetComponent->HealthChanged.AddDynamic(this, &AEnemyCharacter::NetMulticast_RefreshHealthBar);
 
 	OffsetLocation = GetActorLocation();
 
@@ -71,7 +74,7 @@ bool AEnemyCharacter::IsEnemy(AFightCharacter* Character)
 	return Character->IsA<AFogCharacter>();
 }
 
-void AEnemyCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
+/*void AEnemyCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
 						AActor* DamageCauser)
 {
 	AEnemyController* MyController = Cast<AEnemyController>(Controller);
@@ -86,13 +89,26 @@ void AEnemyCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDama
 	Super::TakeDamage(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
 
 	NetMulticast_RefreshHealthBar(Health / MaxHealth);
+}*/
+
+void AEnemyCharacter::MakeTakeDamageReaction()
+{
+	AEnemyController* MyController = Cast<AEnemyController>(Controller);
+
+	if (TakeDamageReactionAnim && MyController)
+	{
+		float AnimTime = TakeDamageReactionAnim->GetPlayLength() / TakeDamageReactionAnim->RateScale;
+		MyController->SetTakeDamageReactionForTime(AnimTime);
+		NetMulticast_PlayMontage(TakeDamageReactionAnim);
+	}
 }
 
-void AEnemyCharacter::NetMulticast_RefreshHealthBar_Implementation(float Percent)
+void AEnemyCharacter::NetMulticast_RefreshHealthBar_Implementation(float Current, float Max)
 {
 	UHealthBarWidget* HealthBar = Cast<UHealthBarWidget>(HealthWidget->GetUserWidgetObject());
 	if (HealthBar)
 	{
+		float Percent = Current / Max;
 		HealthBar->SetHealthPercent(Percent);
 
 		if (Percent <= 0.0f)

@@ -26,7 +26,7 @@ void UFogAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 			AFightCharacter* Character = Cast<AFightCharacter>(GetOwningActor());
 			if (Character)
 			{
-				Character->OnDead();
+				Character->Dead();
 			}
 		}
 		

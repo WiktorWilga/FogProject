@@ -36,14 +36,9 @@ void AFightCharacter::BeginPlay()
 
 	Health = MaxHealth;
 
-	OnTakeAnyDamage.AddDynamic(this, &AFightCharacter::TakeDamage);
+	//deprecated - now Gameplay Ability System is in use
+	//OnTakeAnyDamage.AddDynamic(this, &AFightCharacter::TakeDamage);
 
-	FogAttributeSetComponent->HealthChanged.AddDynamic(this, &AFightCharacter::HealthChange);
-}
-
-void AFightCharacter::HealthChange(float Current, float Max)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Delegate broadcast, %f, %f"), Current, Max);
 }
 
 // Called every frame
@@ -60,7 +55,8 @@ void AFightCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 
 }
 
-void AFightCharacter::TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
+//deprecated - now Gameplay Ability System is in use
+/*void AFightCharacter::TakeDamage(AActor* DamagedActor, float Damage, const class UDamageType* DamageType,
 	class AController* InstigatedBy, AActor* DamageCauser)
 {
 	Health -= Damage;
@@ -69,9 +65,9 @@ void AFightCharacter::TakeDamage(AActor* DamagedActor, float Damage, const class
 		Server_Death();
 		NetMulticast_Death();
 	}
-}
+}*/
 
-void AFightCharacter::OnDead()
+void AFightCharacter::Dead()
 {
 	Server_Death();
 	NetMulticast_Death();

@@ -27,6 +27,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "FogPlayerController.h"
 #include "FogHUDWidget.h"
+#include "FogAttributeSet.h"
 
 AFogCharacter::AFogCharacter()
 {
@@ -80,6 +81,8 @@ void AFogCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutL
 void AFogCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	FogAttributeSetComponent->HealthChanged.AddDynamic(this, &AFogCharacter::Client_RefreshHealthWidget);
 
 	if (!IsLocallyControlled())
 	{
@@ -297,18 +300,19 @@ bool AFogCharacter::Server_UseSpell_Validate(FName Spell)
 	return false;
 }
 
-void AFogCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+//deprecated - now Gameplay Ability System is in use
+/*void AFogCharacter::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	Super::TakeDamage(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
 
 	Client_RefreshHealthWidget(Health / MaxHealth);
-}
+}*/
 
-void AFogCharacter::Client_RefreshHealthWidget_Implementation(float CurrentPercent)
+void AFogCharacter::Client_RefreshHealthWidget_Implementation(float Current, float Max)
 {
 	auto FogPlayerController = Cast<AFogPlayerController>(GetController());
 	if (FogPlayerController && FogPlayerController->HUDInstance)
 	{
-		FogPlayerController->HUDInstance->SetHealthPercent(CurrentPercent);
+		FogPlayerController->HUDInstance->SetHealthPercent(Current/Max);
 	}
 }

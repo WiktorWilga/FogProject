@@ -30,7 +30,6 @@ void AWeapon::BeginPlay()
 	if (HasAuthority())
 	{
 		Mesh->OnComponentBeginOverlap.AddDynamic(this, &AWeapon::OnOverlapBegin);
-		Mesh->OnComponentEndOverlap.AddDynamic(this, &AWeapon::OnOverlapEnd);
 	}
 }
 
@@ -71,15 +70,11 @@ void AWeapon::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 
 	if (MyCharacter->IsEnemy(AttackedCharacter))
 	{
+		//deprecated - now Gameplay Ability System is in use
 		//UGameplayStatics::ApplyDamage(AttackedCharacter, WeaponData->Damage, nullptr, this, UDamageType::StaticClass());
-		MyCharacter->AbilityComponent->ApplyGameplayEffectToTarget(MyCharacter->MeleeAttackDamageGameplayEffect.GetDefaultObject(),
+		MyCharacter->AbilityComponent->ApplyGameplayEffectToTarget(AttackedCharacter->MeleeAttackDamageGameplayEffect.GetDefaultObject(),
 																	AttackedCharacter->AbilityComponent);
+		AttackedCharacter->MakeTakeDamageReaction();
 	}
-
-}
-
-void AWeapon::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex)
-{
 
 }
